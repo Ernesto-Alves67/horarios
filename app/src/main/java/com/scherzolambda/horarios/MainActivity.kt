@@ -1,0 +1,20 @@
+package com.scherzolambda.horarios
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import com.scherzolambda.horarios.ui.navigation.NavHost
+import com.scherzolambda.horarios.ui.theme.HorariosTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            HorariosTheme {
+                NavHost()
+            }
+        }
+    }
+}
