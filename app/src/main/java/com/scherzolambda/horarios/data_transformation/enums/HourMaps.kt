@@ -31,5 +31,16 @@ object HourMaps {
         HourType.N -> N
         HourType.M -> M
     }
+
+    fun getHourRange(type: HourType, period: Int): String? {
+        val hourMap = getHourMap(type)
+        return hourMap[period]
+    }
+
+    fun getHourName(type: HourType): String = when(type) {
+        HourType.T -> "Tarde"
+        HourType.N -> "Noite"
+        HourType.M -> "Manhã"
+    }
 }
 

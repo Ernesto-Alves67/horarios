@@ -4,7 +4,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,11 +35,11 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.InputStream
-import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun StatusScreen() {
-    val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
+fun StatusScreen(
+    disciplinaViewModel: DisciplinaViewModel
+) {
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
     var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
@@ -58,7 +57,6 @@ fun StatusScreen() {
     // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
         htmlUri?.let { uri ->
-//            isLoading = true
             val tempFile = withContext(Dispatchers.IO) {
                 val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
                 val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
@@ -69,7 +67,6 @@ fun StatusScreen() {
                 tempFile
             }
             disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
-//            isLoading = false
             salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
             Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
             coroutineScope.launch {
@@ -112,14 +109,6 @@ fun StatusScreen() {
             Text("Selecionar arquivo HTML para substituir disciplinas")
         }
         if (disciplinas.isNotEmpty()) {
-//            Button(
-//                onClick = { launcher.launch(arrayOf("text/html")) },
-//                modifier = Modifier
-//                    .padding(16.dp)
-//                    .fillMaxWidth()
-//            ) {
-//                Text("Selecionar arquivo HTML para substituir disciplinas")
-//            }
             LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
                 item {
                     Card(

@@ -1,17 +1,16 @@
 package com.scherzolambda.horarios.data_transformation
 import android.util.Log
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
 data class Disciplina(
     val codigo: String,
     val componenteCurricular: String,
+    val docente: String = "",
     val turma: String = "",
     val status: String = "",
     val horario: String = "",
@@ -22,6 +21,7 @@ data class Disciplina(
 data class DisciplinaSerializable(
     val codigo: String,
     val componenteCurricular: String,
+    val docente: String = "",
     val turma: String = "",
     val status: String = "",
     val horario: String = "",
@@ -65,15 +65,18 @@ class FileProcessor {
                 if ( !(tableIndex == 0 || tableIndex == 2)) {
                     try {
                         val componenteCurricular = cells[1].select("span.componente").text()
-                        val local = cells[1].select("span.local").text()
-                        println("  - Componente Curricular: $local")
+                        // Remove prefixo "Local:" (caso-insensitivo) e espaços extras, mantendo só o valor do local
+                        val localRaw = cells[1].select("span.local").text()
+                        val local = localRaw.replaceFirst(Regex("(?i)\\s*Local\\s*:\\s*"), "").trim()
+                        val docente = cells[1].select("span.docente").text()
                         val horarioBruto = cells[4].text()
                         val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
-                        Log.d("FileProcessor", " Horário limpo: '$horarioLimpo'")
+                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
                         val disciplina = Disciplina(
                             // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
+                            docente = docente,
                             turma = cells[2].text(),
                             status = cells[3].text(),
                             horario = horarioLimpo,
@@ -98,10 +101,11 @@ fun salvarDisciplinasLocal(context: android.content.Context, disciplinas: List<D
             DisciplinaSerializable(
                 codigo = it.codigo,
                 componenteCurricular = it.componenteCurricular,
+                docente = it.docente,
                 turma = it.turma,
                 status = it.status,
                 horario = it.horario,
-                local = it.local
+                local = it.local,
             )
         }
         val json = Json.encodeToString(serializaveis)
@@ -124,6 +128,7 @@ fun lerDisciplinasLocal(context: android.content.Context, fileName: String = "di
             Disciplina(
                 codigo = it.codigo,
                 componenteCurricular = it.componenteCurricular,
+                docente = it.docente,
                 turma = it.turma,
                 status = it.status,
                 horario = it.horario,
