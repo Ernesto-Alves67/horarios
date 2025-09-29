@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -51,10 +52,11 @@ fun StatusScreen() {
     val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
 
-    // Quando o arquivo HTML é selecionado, extrai as tabelas
+    // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
         htmlUri?.let { uri ->
             isLoading = true
+            tabelas = emptyList() // Limpa o estado das tabelas ao selecionar novo arquivo
             val tabelasExtraidas = withContext(Dispatchers.IO) {
                 val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
                 val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
@@ -67,6 +69,18 @@ fun StatusScreen() {
             }
             tabelas = tabelasExtraidas
             isLoading = false
+            // Salva automaticamente ao sucesso da leitura
+            val disciplinas = tabelasExtraidas.flatten()
+            val sucesso = salvarDisciplinasLocal(context, disciplinas)
+            salvarStatus = if (sucesso) {
+                "Arquivo de disciplinas substituído com sucesso!"
+            } else {
+                "Erro ao salvar disciplinas."
+            }
+            Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
+            coroutineScope.launch {
+                DataStoreHelper.setFileLoaded(context, true)
+            }
         }
     }
 
@@ -76,9 +90,9 @@ fun StatusScreen() {
         }
     }
 
-    // Carrega disciplinas do cache se já houver arquivo salvo
-    LaunchedEffect(isFileLoaded) {
-        if (isFileLoaded && tabelas.isEmpty()) {
+    // Carrega disciplinas do cache se já houver arquivo salvo E nenhum arquivo HTML está selecionado
+    LaunchedEffect(isFileLoaded, htmlUri) {
+        if (isFileLoaded && tabelas.isEmpty() && htmlUri == null) {
             val disciplinas = lerDisciplinasLocal(context)
             if (disciplinas.isNotEmpty()) {
                 tabelas = listOf(disciplinas)
@@ -98,39 +112,24 @@ fun StatusScreen() {
         if (isFileLoaded) {
             Text("Um arquivo já foi carregado anteriormente.", modifier = Modifier.padding(8.dp))
         }
+        // O botão agora só serve para selecionar arquivo HTML
         Button(
             onClick = { launcher.launch(arrayOf("text/html")) },
             modifier = Modifier
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Text("Selecionar arquivo HTML")
+            Text("Selecionar arquivo HTML para substituir disciplinas")
         }
         if (tabelas.isNotEmpty()) {
             Button(
-                onClick = {
-                    val disciplinas = tabelas.flatten()
-                    val sucesso = salvarDisciplinasLocal(context, disciplinas)
-                    salvarStatus = if (sucesso) "Disciplinas salvas com sucesso!" else "Erro ao salvar disciplinas."
-                    Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
-                    // Marca que um arquivo foi carregado
-                    coroutineScope.launch {
-                        DataStoreHelper.setFileLoaded(context, true)
-                    }
-                },
+                onClick = { launcher.launch(arrayOf("text/html")) },
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .padding(16.dp)
                     .fillMaxWidth()
             ) {
-                Text("Salvar disciplinas")
+                Text("Selecionar arquivo HTML para substituir disciplinas")
             }
-        }
-        if (htmlUri != null) {
-            Text("Arquivo selecionado: $htmlUri", modifier = Modifier.padding(8.dp))
-        }
-        if (isLoading) {
-            Text("Extraindo tabelas... Aguarde.", modifier = Modifier.padding(8.dp))
-        } else if (tabelas.isNotEmpty()) {
             LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
                 items(tabelas) { tabela ->
                     Card(
@@ -142,10 +141,11 @@ fun StatusScreen() {
 
                                     Row{
                                         Text(disciplina.codigo)
-//                                    Text(disciplina.componenteCurricular)
-                                        Text(disciplina.turma)
+                                        Spacer(modifier = Modifier.padding(4.dp))
+                                        Text(disciplina.componenteCurricular)
+//                                        Text(disciplina.turma)
 //                                    Text(disciplina.status)
-                                        Text(disciplina.horario)
+//                                        Text(disciplina.horario)
                                     }
                                 }
                             }

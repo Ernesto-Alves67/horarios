@@ -1,6 +1,6 @@
 package com.scherzolambda.horarios.data_transformation.enums
 
-enum class HourType { T, N, M }
+enum class HourType(val type: String) { T("T"), N("N"), M("M") }
 
 object HourMaps {
     val T = mapOf(

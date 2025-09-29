@@ -1,4 +1,5 @@
 package com.scherzolambda.horarios.data_transformation
+import android.util.Log
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import java.io.File
@@ -53,18 +54,20 @@ class FileProcessor {
 
         tables.forEachIndexed { tableIndex, table ->
             val disciplinasDaTabela = mutableListOf<Disciplina>()
-            val rows = table.select("tr:gt(0)")
-
+            val rows = table.select("tbody tr")
+//            println("Processando Tabela ${tableIndex + 1} com ${rows} linhas.\n")
             rows.forEach { row ->
 
                 val cells = row.select("td")
-
-                if (cells.size >= 5 && !(tableIndex == 0 || tableIndex == 2)) {
+//                Log.d("FileProcessor", "Tabela ${tableIndex + 1}, Linha: ${row.text()}, Células: ${cells.size}")
+                if ( !(tableIndex == 0 || tableIndex == 2)) {
                     try {
+                        val componenteCurricular = cells[1].select("span.componente").text()
+//                        println("  - Componente Curricular: $componenteCurricular")
                         val disciplina = Disciplina(
                             // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
-                            componenteCurricular = cells[1].text(),
+                            componenteCurricular = componenteCurricular,
                             turma = cells[2].text(),
                             status = cells[3].text(),
                             horario = cells[4].text()

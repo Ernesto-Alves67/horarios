@@ -54,7 +54,6 @@ fun NavHost() {
             pagerState.animateScrollToPage(selectedIndex)
         }
     }
-    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -83,7 +82,7 @@ fun NavHost() {
         ) { page ->
             when (page) {
                 0 -> DailyScreen()
-                1 -> WeeklyScreen()
+                1 -> WeeklyScreen(innerPadding)
                 2 -> StatusScreen()
             }
         }

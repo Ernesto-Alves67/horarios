@@ -21,11 +21,11 @@ class DataPreparation {
                 val periodoDia = match.groupValues[2]
                 val horario = match.groupValues[3]
 
-                return Triple<String,String,String>(diaSemana, periodoDia, horario)
+                return Triple(diaSemana, periodoDia, horario)
             }
         } else {
             println("❌ Nenhuma correspondência de código encontrada.")
         }
-        return Triple<String,String,String>("","","")
+        return Triple("","","")
     }
 }
