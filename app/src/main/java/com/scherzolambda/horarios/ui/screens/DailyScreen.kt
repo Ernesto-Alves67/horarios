@@ -51,9 +51,15 @@ fun HoursOfDayComponent(
                     Text(hour)
                 }
                 disciplinasNoHorario.forEach { disciplina ->
+                    Log.d("HoursOfDayComponent", "Disciplina no horário: ${disciplina.local}")
                     Text(
                         text = disciplina.disciplina,
                         fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 24.dp, bottom = 2.dp)
+                    )
+                    Text(
+                        text = disciplina.local,
+                        fontSize = 12.sp,
                         modifier = Modifier.padding(start = 24.dp, bottom = 2.dp)
                     )
                 }
@@ -79,9 +85,9 @@ fun DailyScreen(
     Log.d("DailyScreen", "Disciplinas lidas: $disciplinas")
     val disciplinasHoje = getTodayClasses(disciplinas)
 
-    LaunchedEffect(Unit) {
-        disciplinaViewModel.carregarDisciplinasLocal()
-    }
+//    LaunchedEffect(Unit) {
+//        disciplinaViewModel.carregarDisciplinasLocal()
+//    }
     Column(
         modifier = Modifier
             .padding(paddingValues)

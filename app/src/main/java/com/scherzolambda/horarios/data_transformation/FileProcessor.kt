@@ -67,13 +67,16 @@ class FileProcessor {
                         val componenteCurricular = cells[1].select("span.componente").text()
                         val local = cells[1].select("span.local").text()
                         println("  - Componente Curricular: $local")
+                        val horarioBruto = cells[4].text()
+                        val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
+                        Log.d("FileProcessor", " Horário limpo: '$horarioLimpo'")
                         val disciplina = Disciplina(
                             // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
                             turma = cells[2].text(),
                             status = cells[3].text(),
-                            horario = cells[4].text(),
+                            horario = horarioLimpo,
                             local = local
                         )
                         disciplinasDaTabela.add(disciplina)

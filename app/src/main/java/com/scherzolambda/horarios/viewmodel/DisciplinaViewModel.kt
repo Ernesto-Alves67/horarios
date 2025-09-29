@@ -10,7 +10,6 @@ import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
 import com.scherzolambda.horarios.data_transformation.HorarioSemanal
-import com.scherzolambda.horarios.data_transformation.montarHorariosSemanais
 import com.scherzolambda.horarios.data_transformation.montarHorariosSemanaisDeDisciplinas
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +22,10 @@ class DisciplinaViewModel @Inject constructor(
 ) : AndroidViewModel(context as Application) {
     private val _disciplinas = MutableStateFlow<List<Disciplina>>(emptyList())
     val disciplinas: StateFlow<List<Disciplina>> = _disciplinas
+
+    init {
+        carregarDisciplinasLocal()
+    }
 
     fun carregarDisciplinasLocal() {
         viewModelScope.launch {
@@ -40,10 +43,12 @@ class DisciplinaViewModel @Inject constructor(
 
     fun carregarDeArquivoHtml(filePath: String) {
         viewModelScope.launch {
+            _disciplinas.value = emptyList() // Limpa a lista antes de carregar novas disciplinas
             val tabelas = fileProcessor.extrairTabelasDeHtml(filePath)
             // Supondo que a tabela principal é a primeira não vazia
             val disciplinas = tabelas.firstOrNull { it.isNotEmpty() } ?: emptyList()
             _disciplinas.value = disciplinas
+            salvarDisciplinasLocal(disciplinas)
         }
     }
 

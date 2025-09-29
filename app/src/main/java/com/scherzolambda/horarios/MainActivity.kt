@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.scherzolambda.horarios.ui.navigation.NavHost
+import com.scherzolambda.horarios.ui.navigation.MainNavigation
 import com.scherzolambda.horarios.ui.theme.HorariosTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HorariosTheme {
-                NavHost()
+                MainNavigation()
+//                NavHostLegacy()
             }
         }
     }

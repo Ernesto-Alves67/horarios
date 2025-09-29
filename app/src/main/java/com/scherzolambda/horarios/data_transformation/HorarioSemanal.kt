@@ -12,5 +12,6 @@ data class HorarioSemanal(
     val diaSemana: Int,
     val periodo: HourType,
     val horario: Int,
-    val disciplina: String
+    val disciplina: String,
+    val local: String
 )
