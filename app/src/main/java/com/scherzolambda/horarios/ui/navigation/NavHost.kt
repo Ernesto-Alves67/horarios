@@ -25,17 +25,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.scherzolambda.horarios.ui.screens.DailyScreen
 import com.scherzolambda.horarios.ui.screens.StatusScreen
 import com.scherzolambda.horarios.ui.screens.WeeklyScreen
 import com.scherzolambda.horarios.ui.theme.HorariosTheme
 import com.scherzolambda.horarios.ui.theme.UFCATGreen
-
+import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NavHost() {
+fun NavHostLegacy() {
     val items = listOf("Hoje", "Semana", "Status")
     var selectedIndex by remember { mutableStateOf(0) }
     val icons = listOf(
@@ -47,7 +48,6 @@ fun NavHost() {
         initialPage = 0,
         pageCount = { items.size  }
     )
-
     // Sincroniza o pager quando selectedIndex muda
     LaunchedEffect(selectedIndex) {
         if (pagerState.currentPage != selectedIndex) {
@@ -75,13 +75,12 @@ fun NavHost() {
             }
         }
     ) { innerPadding ->
-        // Removido .padding(innerPadding) do HorizontalPager para evitar conflitos de scroll/padding
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
             when (page) {
-                0 -> DailyScreen()
+                0 -> DailyScreen(innerPadding)
                 1 -> WeeklyScreen(innerPadding)
                 2 -> StatusScreen()
             }

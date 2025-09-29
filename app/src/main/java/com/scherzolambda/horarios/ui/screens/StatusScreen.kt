@@ -28,6 +28,7 @@ import com.scherzolambda.horarios.data_transformation.FileProcessor
 import com.scherzolambda.horarios.data_transformation.salvarDisciplinasLocal
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.lerDisciplinasLocal
+import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,11 +36,14 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.io.InputStream
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun StatusScreen() {
+    val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
+    val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
+    val disciplinas = disciplinasState.value
     var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    var tabelas by remember { mutableStateOf<List<List<Disciplina>>>(emptyList()) }
     var isLoading by remember { mutableStateOf(false) }
     var salvarStatus by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
@@ -47,7 +51,6 @@ fun StatusScreen() {
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> htmlUri = uri }
     )
-
     val isFirstAccess by DataStoreHelper.isFirstAccessFlow(context).collectAsState(initial = true)
     val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
     val coroutineScope = rememberCoroutineScope()
@@ -55,28 +58,19 @@ fun StatusScreen() {
     // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
         htmlUri?.let { uri ->
-            isLoading = true
-            tabelas = emptyList() // Limpa o estado das tabelas ao selecionar novo arquivo
-            val tabelasExtraidas = withContext(Dispatchers.IO) {
+//            isLoading = true
+            val tempFile = withContext(Dispatchers.IO) {
                 val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
                 val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
                 val outputStream = tempFile.outputStream()
                 inputStream?.copyTo(outputStream)
                 inputStream?.close()
                 outputStream.close()
-                val processor = FileProcessor()
-                processor.extrairTabelasDeHtml(tempFile.absolutePath)
+                tempFile
             }
-            tabelas = tabelasExtraidas
-            isLoading = false
-            // Salva automaticamente ao sucesso da leitura
-            val disciplinas = tabelasExtraidas.flatten()
-            val sucesso = salvarDisciplinasLocal(context, disciplinas)
-            salvarStatus = if (sucesso) {
-                "Arquivo de disciplinas substituído com sucesso!"
-            } else {
-                "Erro ao salvar disciplinas."
-            }
+            disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
+//            isLoading = false
+            salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
             Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
             coroutineScope.launch {
                 DataStoreHelper.setFileLoaded(context, true)
@@ -92,12 +86,9 @@ fun StatusScreen() {
 
     // Carrega disciplinas do cache se já houver arquivo salvo E nenhum arquivo HTML está selecionado
     LaunchedEffect(isFileLoaded, htmlUri) {
-        if (isFileLoaded && tabelas.isEmpty() && htmlUri == null) {
-            val disciplinas = lerDisciplinasLocal(context)
-            if (disciplinas.isNotEmpty()) {
-                tabelas = listOf(disciplinas)
-                salvarStatus = "Disciplinas carregadas do cache."
-            }
+        if (isFileLoaded && disciplinas.isEmpty() && htmlUri == null) {
+            disciplinaViewModel.carregarDisciplinasLocal()
+            salvarStatus = "Disciplinas carregadas do cache."
         }
     }
 
@@ -112,7 +103,6 @@ fun StatusScreen() {
         if (isFileLoaded) {
             Text("Um arquivo já foi carregado anteriormente.", modifier = Modifier.padding(8.dp))
         }
-        // O botão agora só serve para selecionar arquivo HTML
         Button(
             onClick = { launcher.launch(arrayOf("text/html")) },
             modifier = Modifier
@@ -121,31 +111,27 @@ fun StatusScreen() {
         ) {
             Text("Selecionar arquivo HTML para substituir disciplinas")
         }
-        if (tabelas.isNotEmpty()) {
-            Button(
-                onClick = { launcher.launch(arrayOf("text/html")) },
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            ) {
-                Text("Selecionar arquivo HTML para substituir disciplinas")
-            }
+        if (disciplinas.isNotEmpty()) {
+//            Button(
+//                onClick = { launcher.launch(arrayOf("text/html")) },
+//                modifier = Modifier
+//                    .padding(16.dp)
+//                    .fillMaxWidth()
+//            ) {
+//                Text("Selecionar arquivo HTML para substituir disciplinas")
+//            }
             LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
-                items(tabelas) { tabela ->
+                item {
                     Card(
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
                         Column(modifier = Modifier.padding(8.dp)) {
-                            tabela.forEach { disciplina ->
+                            disciplinas.forEach { disciplina ->
                                 if (disciplina.codigo.isNotEmpty()) {
-
                                     Row{
                                         Text(disciplina.codigo)
                                         Spacer(modifier = Modifier.padding(4.dp))
                                         Text(disciplina.componenteCurricular)
-//                                        Text(disciplina.turma)
-//                                    Text(disciplina.status)
-//                                        Text(disciplina.horario)
                                     }
                                 }
                             }

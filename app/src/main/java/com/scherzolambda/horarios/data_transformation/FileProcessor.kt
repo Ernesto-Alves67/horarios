@@ -14,7 +14,8 @@ data class Disciplina(
     val componenteCurricular: String,
     val turma: String = "",
     val status: String = "",
-    val horario: String = ""
+    val horario: String = "",
+    val local: String = ""
 )
 
 @Serializable
@@ -23,7 +24,8 @@ data class DisciplinaSerializable(
     val componenteCurricular: String,
     val turma: String = "",
     val status: String = "",
-    val horario: String = ""
+    val horario: String = "",
+    val local: String = ""
 )
 
 class FileProcessor {
@@ -37,7 +39,7 @@ class FileProcessor {
 
         // 1. Carregar o documento HTML
         val doc = try {
-            Jsoup.parse(File(filePath), "UTF-8")
+            Jsoup.parse(File(filePath), "ISO-8859-1")
         } catch (e: Exception) {
             println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
             return emptyList()
@@ -63,14 +65,16 @@ class FileProcessor {
                 if ( !(tableIndex == 0 || tableIndex == 2)) {
                     try {
                         val componenteCurricular = cells[1].select("span.componente").text()
-//                        println("  - Componente Curricular: $componenteCurricular")
+                        val local = cells[1].select("span.local").text()
+                        println("  - Componente Curricular: $local")
                         val disciplina = Disciplina(
                             // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
                             turma = cells[2].text(),
                             status = cells[3].text(),
-                            horario = cells[4].text()
+                            horario = cells[4].text(),
+                            local = local
                         )
                         disciplinasDaTabela.add(disciplina)
                     } catch (e: Exception) {
@@ -93,7 +97,8 @@ fun salvarDisciplinasLocal(context: android.content.Context, disciplinas: List<D
                 componenteCurricular = it.componenteCurricular,
                 turma = it.turma,
                 status = it.status,
-                horario = it.horario
+                horario = it.horario,
+                local = it.local
             )
         }
         val json = Json.encodeToString(serializaveis)
@@ -118,7 +123,8 @@ fun lerDisciplinasLocal(context: android.content.Context, fileName: String = "di
                 componenteCurricular = it.componenteCurricular,
                 turma = it.turma,
                 status = it.status,
-                horario = it.horario
+                horario = it.horario,
+                local = it.local
             )
         }
     } catch (e: Exception) {

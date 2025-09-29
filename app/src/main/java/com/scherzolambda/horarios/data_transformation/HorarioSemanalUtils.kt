@@ -4,6 +4,7 @@ import android.util.Log
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
+import java.time.LocalDate
 import kotlin.text.map
 
 // Função utilitária para montar lista de HorarioSemanal a partir de um texto e disciplina
@@ -141,4 +142,15 @@ fun montarHorariosSemanaisDeDisciplinas(disciplinas: List<Disciplina>): List<Hor
         }
     }
     return horarios
+}
+
+fun filtrarHorariosDoDiaAtual(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
+    val diaAtual = LocalDate.now().dayOfWeek.value + 1 // 1=Segunda, 7=Domingo
+    return horarios.filter { it.diaSemana == diaAtual }
+}
+
+fun getTodayClasses(disciplinas: List<Disciplina>): List<HorarioSemanal> {
+    val horarios = montarHorariosSemanaisDeDisciplinas(disciplinas)
+    return filtrarHorariosDoDiaAtual(horarios)
+
 }
