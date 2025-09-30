@@ -34,7 +34,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Diagnostic: Java and Gradle versions
+      - name: Diagnostic Java and Gradle versions
         run: |
           echo "--- java -version ---"
           java -version || true
