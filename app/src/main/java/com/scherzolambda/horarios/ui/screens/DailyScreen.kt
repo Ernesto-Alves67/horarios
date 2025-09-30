@@ -1,6 +1,17 @@
 package com.scherzolambda.horarios.ui.screens
 
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.InputStream
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +35,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +55,7 @@ import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
+import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
@@ -63,57 +74,87 @@ fun DailyScreen(
     val disciplinasHoje = getTodayClasses(disciplinas)
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
 
-    val scrollState = rememberScrollState()
-
+    var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var salvarStatus by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri -> htmlUri = uri }
+    )
+    val isFirstAccess by DataStoreHelper.isFirstAccessFlow(context).collectAsState(initial = true)
+    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
+    val coroutineScope = rememberCoroutineScope()
 
     Column(modifier = Modifier
         .fillMaxSize()
     ) {
 
-        // Header fixo no topo
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color(0xFFFF3366), // tom rosa-avermelhado
-                            Color(0xFFFF6600)  // tom laranja
-                        )
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+        if (disciplinas.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Nenhuma disciplina encontrada.", modifier = Modifier.padding(8.dp))
+                androidx.compose.material3.Button(
+                    onClick = { launcher.launch(arrayOf("text/html")) },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.scherzolambda.horarios.ui.theme.UFCATGreen)
+                ) {
+                    Text("Selecionar arquivo HTML", fontSize = 18.sp)
+                }
+            }
+        } else {
+            // Header fixo no topo
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color(0xFFFF3366), // tom rosa-avermelhado
+                                Color(0xFFFF6600)  // tom laranja
+                            )
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(vertical = 8.dp, horizontal = 8.dp)
+            ) {
+                Text(
+                    text = "Aulas de Hoje",
+                    fontSize = 32.sp,
+                    fontWeight = Bold,
+                    modifier = Modifier.align(Alignment.Center)
                 )
-                .padding(vertical = 8.dp, horizontal = 8.dp)
-        ) {
-            Text(
-                text = "Aulas de Hoje",
-                fontSize = 32.sp,
-                fontWeight = Bold,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
-        // Conteúdo rolável que ocupa o restante do espaço
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(scrollState)
-                .padding(4.dp),
-            verticalArrangement = Arrangement.Top
-        ) {
-            if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
-                HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-            }
-            if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
-                HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-            }
-            if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
-                HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
             }
 
-            Spacer(modifier = Modifier.padding(8.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(4.dp),
+                verticalArrangement = Arrangement.Top
+            ) {
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
+                    HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                }
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
+                    HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                }
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
+                    HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                }
+
+                Spacer(modifier = Modifier.padding(8.dp))
+            }
         }
+
 
         // Dialog (fora da área rolável) para ficar acima do conteúdo quando aberto
         if (selectedCell != null) {
@@ -150,6 +191,34 @@ fun DailyScreen(
                 }
             )
         }
+
+        // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
+        LaunchedEffect(htmlUri) {
+            htmlUri?.let { uri ->
+                val tempFile = withContext(Dispatchers.IO) {
+                    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
+                    val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
+                    val outputStream = tempFile.outputStream()
+                    inputStream?.copyTo(outputStream)
+                    inputStream?.close()
+                    outputStream.close()
+                    tempFile
+                }
+                disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
+                salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
+                Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
+                coroutineScope.launch {
+                    DataStoreHelper.setFileLoaded(context, true)
+                }
+            }
+        }
+
+        LaunchedEffect(isFirstAccess) {
+            if (isFirstAccess) {
+                DataStoreHelper.setFirstAccess(context, false)
+            }
+        }
+
     }
 }
 
@@ -208,7 +277,6 @@ fun HoursOfDayComponent(
                                 fontSize = 18.sp)
                             Text(hour, color = UfcatBlack)
                         }
-                        // Lista de disciplinas neste horário, cada disciplina em sua própria coluna com espaçamento interno
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             disciplinasNoHorario.forEach { disciplina ->
                                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -239,25 +307,4 @@ fun HoursOfDayComponent(
 
 fun existeDisciplinaNoTurno(disciplinasHoje: List<HorarioSemanal>, hourType: HourType): Boolean {
     return disciplinasHoje.any { it.periodo == hourType }
-}
-@Composable
-fun Tittle2(textTittle: String,
-            containerColor: Color
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .background(color = containerColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-//            .padding(vertical = 3.dp, horizontal = 3.dp)
-    ) {
-
-        Text(
-            text = textTittle,
-            fontSize = 20.sp,
-            fontWeight = Bold,
-            color = UfcatBlack,
-            modifier = Modifier.padding(2.dp)
-        )
-    }
 }

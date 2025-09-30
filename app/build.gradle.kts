@@ -59,6 +59,7 @@ dependencies {
     // Para manipulação de JSON (Kotlinx Serialization)
     implementation(libs.kotlinx.serialization.json)
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +72,6 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     // AndroidX SplashScreen
     implementation("androidx.core:core-splashscreen:1.0.1")
+    // ConstraintLayout for Jetpack Compose
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }

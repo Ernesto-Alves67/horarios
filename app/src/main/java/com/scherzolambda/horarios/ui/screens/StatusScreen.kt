@@ -1,39 +1,45 @@
 package com.scherzolambda.horarios.ui.screens
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.scherzolambda.horarios.data_transformation.Disciplina
-import com.scherzolambda.horarios.data_transformation.FileProcessor
-import com.scherzolambda.horarios.data_transformation.salvarDisciplinasLocal
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+
+import androidx.constraintlayout.compose.Dimension
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
-import com.scherzolambda.horarios.data_transformation.lerDisciplinasLocal
+import com.scherzolambda.horarios.ui.theme.AppTypography
+import com.scherzolambda.horarios.ui.theme.UFCATGreen
+import com.scherzolambda.horarios.ui.theme.UfcatOrange
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import java.io.InputStream
 
 @Composable
@@ -89,47 +95,140 @@ fun StatusScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+//    Column(
+//        modifier = Modifier.fillMaxSize().padding(8.dp),
+//        verticalArrangement = Arrangement.Top,
+////        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//
+//        if (disciplinas.isNotEmpty()) {
+//            LazyColumn(
+//                modifier = Modifier.weight(1f).fillMaxWidth(),
+//                verticalArrangement = Arrangement.spacedBy(8.dp)
+//            ) {
+//                items(disciplinas.size) { disciplina ->
+//                    if (disciplinas[disciplina].codigo.isNotEmpty()) {
+//                        Card(
+//                            elevation = CardDefaults.cardElevation(4.dp),
+//                            modifier = Modifier.fillMaxWidth()
+//                        ) {
+//                            Row(
+//                                modifier = Modifier.padding(12.dp),
+//                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                            ) {
+//                                Text(disciplinas[disciplina].codigo, style = AppTypography.headlineSmall)
+//                                Text(disciplinas[disciplina].componenteCurricular, style = AppTypography.headlineSmall)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } else {
+//            Text("Nenhuma tabela encontrada.", modifier = Modifier.padding(8.dp))
+//        }
+//
+//        if (isFirstAccess) {
+//            Text("Bem-vindo! Este é seu primeiro acesso.", modifier = Modifier.padding(8.dp))
+//        }
+//        if (isFileLoaded) {
+//            Text("Um arquivo já foi carregado anteriormente. \n Mas você pode carregar outro.", modifier = Modifier.padding(8.dp))
+//        }
+//        Button(
+//            onClick = { launcher.launch(arrayOf("text/html")) },
+//            modifier = Modifier
+//                .padding(16.dp)
+//                .fillMaxWidth(),
+//            colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen)
+//        ) {
+//            Text("Selecionar arquivo HTML", fontSize = 18.sp)
+//        }
+//    }
+
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
-        if (isFirstAccess) {
-            Text("Bem-vindo! Este é seu primeiro acesso.", modifier = Modifier.padding(8.dp))
-        }
-        if (isFileLoaded) {
-            Text("Um arquivo já foi carregado anteriormente.", modifier = Modifier.padding(8.dp))
-        }
-        Button(
-            onClick = { launcher.launch(arrayOf("text/html")) },
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
-        ) {
-            Text("Selecionar arquivo HTML para substituir disciplinas")
-        }
+        val (lazyListRef, firstAccessRef, fileLoadedRef, buttonRef) = createRefs()
+
         if (disciplinas.isNotEmpty()) {
-            LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
-                item {
-                    Card(
-                        elevation = CardDefaults.cardElevation(4.dp)
-                    ) {
-                        Column(modifier = Modifier.padding(8.dp)) {
-                            disciplinas.forEach { disciplina ->
-                                if (disciplina.codigo.isNotEmpty()) {
-                                    Row{
-                                        Text(disciplina.codigo)
-                                        Spacer(modifier = Modifier.padding(4.dp))
-                                        Text(disciplina.componenteCurricular)
-                                    }
-                                }
+            LazyColumn(
+                modifier = Modifier
+                    .constrainAs(lazyListRef) {
+                        top.linkTo(parent.top, margin = 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints
+                    }
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(disciplinas.size) { index ->
+                    val disciplina = disciplinas[index]
+                    if (disciplina.codigo.isNotEmpty()) {
+                        Card(
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(disciplina.codigo, style = AppTypography.headlineSmall)
+                                Text(
+                                    disciplina.componenteCurricular,
+                                    style = AppTypography.headlineSmall
+                                )
                             }
                         }
                     }
                 }
             }
         } else {
-            Text("Nenhuma tabela encontrada.", modifier = Modifier.padding(8.dp))
+            Text(
+                "Nenhuma tabela encontrada.",
+                modifier = Modifier.constrainAs(lazyListRef) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }.padding(8.dp)
+            )
+        }
+
+//        if (isFirstAccess) {
+//            Text(
+//                "Bem-vindo! Este é seu primeiro acesso.",
+//                modifier = Modifier.constrainAs(firstAccessRef) {
+//                    top.linkTo(lazyListRef.bottom, margin = 8.dp)
+//                    start.linkTo(parent.start)
+//                    end.linkTo(parent.end)
+//                }.padding(8.dp)
+//            )
+//        }
+
+        if (isFileLoaded) {
+            Text(
+                "Um arquivo já foi carregado anteriormente. \nMas você pode carregar outro.",
+                modifier = Modifier.constrainAs(fileLoadedRef) {
+                    top.linkTo(lazyListRef.bottom, margin = 8.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                }.padding(8.dp)
+            )
+        }
+
+        Button(
+            onClick = { launcher.launch(arrayOf("text/html")) },
+            modifier = Modifier
+                .constrainAs(buttonRef) {
+                    top.linkTo(fileLoadedRef.bottom, margin = 24.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                },
+            colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen)
+        ) {
+            Text("Selecionar arquivo HTML", fontSize = 18.sp)
         }
     }
 }
