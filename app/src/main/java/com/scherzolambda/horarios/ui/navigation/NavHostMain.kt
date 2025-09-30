@@ -1,5 +1,12 @@
 package com.scherzolambda.horarios.ui.navigation
 
+import android.content.ContentValues
+import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
+import android.util.Log
+import android.webkit.WebView
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
@@ -33,6 +41,7 @@ import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.ui.screens.DailyScreen
 import com.scherzolambda.horarios.ui.screens.StatusScreen
 import com.scherzolambda.horarios.ui.screens.WeeklyScreen
+import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.theme.UFCATGreen
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import androidx.compose.ui.text.font.FontWeight
@@ -44,6 +53,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import org.json.JSONObject
 
 /**
  * Define as telas principais do aplicativo com suas rotas, rótulos e ícones.
@@ -53,28 +71,95 @@ sealed class Screen(val route: String, val label: String, val iconRes: Int) {
     object Daily : Screen("daily", "Hoje", R.drawable.ic_notebook_filled)
     object Weekly : Screen("weekly", "Semana", R.drawable.ic_calendar)
     object Status : Screen("status", "Status", R.drawable.ic_info)
+    object Sigaa : Screen("sigaa", "SIGAA", R.drawable.ic_internet) // Adicione um ícone apropriado
 }
 
-val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status)
+val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
 
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
     val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
-
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Daily.route
 
+    // Estado elevado para WebView
+    var sigaaWebView by remember { mutableStateOf<WebView?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Lógica de download
+    val onDownloadClick: (() -> Unit)? = if (currentRoute == Screen.Sigaa.route) {
+        {
+            // TODO: Melhorar a extração do HTML para garantir que o conteúdo completo seja capturado
+            // e que a codificação seja tratada corretamente.
+            sigaaWebView?.evaluateJavascript(
+                "document.documentElement.outerHTML"
+            ) { html ->
+                // Decodifica corretamente o HTML usando JSONObject
+                val decodedHtml = try {
+                    JSONObject("{\"html\":$html}").getString("html")
+                } catch (e: Exception) {
+                    html.trim('"') // fallback simples
+                }
+                Log.d("Download", "HTML decodificado: $decodedHtml")
+                val metaTag = "<meta http-equiv=\"content-type\" content=\"text/html; charset=windows-1252\">"
+                val headIndex = decodedHtml.indexOf("<head>")
+                val htmlWithMeta = if (headIndex != -1 && !decodedHtml.contains(metaTag)) {
+                    decodedHtml.replaceFirst("<head>", "<head>$metaTag")
+                } else {
+                    decodedHtml
+                }
+                Log.d("Download", "HTML final para salvar: $htmlWithMeta")
+                // Validação do formato do comprovante
+                val isComprovante =
+                    htmlWithMeta.contains("<div id=\"relatorio-container\">") ||
+                    htmlWithMeta.contains("<h3>Comprovante de Matrícula</h3>")
+                if (!isComprovante) {
+                    Toast.makeText(context, "Esta página não é um comprovante de matrícula válido!", Toast.LENGTH_LONG).show()
+                    Log.d("Download", "HTML inválido para comprovante: $htmlWithMeta")
+                    return@evaluateJavascript
+                }
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val fileName = "sigaa_${timeStamp}.html"
+                val resolver = context.contentResolver
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                    put(MediaStore.Downloads.MIME_TYPE, "text/html")
+                }
+                val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    try {
+                        resolver.openOutputStream(uri)?.use { it.write(htmlWithMeta.toByteArray()) }
+                        val filePath = getFilePathFromUri(context, uri) ?: uri.toString()
+                        disciplinaViewModel.carregarDeArquivoHtml(filePath)
+                        Toast.makeText(context, "Página salva e carregada!", Toast.LENGTH_LONG).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Erro ao salvar/carregar: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Erro ao criar arquivo", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    } else null
+
     Scaffold(
-        topBar = { TopBar() },
+        topBar = {
+            TopBar(
+                showDownloadButton = currentRoute == Screen.Sigaa.route,
+                onDownloadClick = onDownloadClick
+            )
+        },
         bottomBar = { BottomNavBar(navController, currentRoute) }
     ) { innerPadding ->
         AppNavHost(
             navController = navController,
             innerPadding = innerPadding,
-            disciplinaViewModel = disciplinaViewModel
+            disciplinaViewModel = disciplinaViewModel,
+            sigaaWebViewRef = { sigaaWebView = it }
         )
     }
 }
@@ -82,7 +167,10 @@ fun MainNavigation() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(
+    showDownloadButton: Boolean = false,
+    onDownloadClick: (() -> Unit)? = null
+) {
     CenterAlignedTopAppBar(
         title = {
             Row(verticalAlignment = Alignment.Bottom) {
@@ -93,6 +181,13 @@ fun TopBar() {
                     tint = White
                 )
                 Text("Horários", fontWeight = FontWeight.Bold, textAlign = TextAlign.Justify)
+            }
+        },
+        actions = {
+            if (showDownloadButton && onDownloadClick != null) {
+                IconButton(onClick = onDownloadClick) {
+                    Icon(painterResource(R.drawable.ic_download), contentDescription = "Baixar HTML")
+                }
             }
         }
     )
@@ -187,11 +282,13 @@ fun GradientIcon(
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     innerPadding: PaddingValues,
-    disciplinaViewModel: DisciplinaViewModel
+    disciplinaViewModel: DisciplinaViewModel,
+    sigaaWebViewRef: (WebView?) -> Unit = {}
 ) {
     NavHost(
         navController = navController,
@@ -201,5 +298,22 @@ fun AppNavHost(
         composable(Screen.Daily.route) { DailyScreen(innerPadding, disciplinaViewModel) }
         composable(Screen.Weekly.route) { WeeklyScreen(innerPadding, disciplinaViewModel) }
         composable(Screen.Status.route) { StatusScreen(disciplinaViewModel) }
+        composable(Screen.Sigaa.route) {
+            SigaaWebScreen(
+                webViewRef = sigaaWebViewRef
+            )
+        }
     }
+}
+
+// Função utilitária para obter o caminho do arquivo a partir do URI
+fun getFilePathFromUri(context: Context, uri: Uri): String? {
+    val projection = arrayOf(MediaStore.Downloads.DATA)
+    context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+        val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Downloads.DATA)
+        if (cursor.moveToFirst()) {
+            return cursor.getString(columnIndex)
+        }
+    }
+    return null
 }

@@ -17,10 +17,10 @@ class DataPreparation {
             val periodoDia = match.groupValues[2]
             val horario = match.groupValues[3]
 
-            Log.d("DataPreparation", "Código completo encontrado: ${match.groupValues[0]}")
+//            Log.d("DataPreparation", "Código completo encontrado: ${match.groupValues[0]}")
             resultados.add(Triple(diaSemana, periodoDia, horario))
         }
-        Log.d("DataPreparation", "Encontradas ${resultados.size} correspondências na string: \"$texto\"")
+//        Log.d("DataPreparation", "Encontradas ${resultados.size} correspondências na string: \"$texto\"")
         return resultados
     }
 }

@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
+import android.util.Log
 import com.scherzolambda.horarios.data_transformation.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.montarHorariosSemanaisDeDisciplinas
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +43,7 @@ class DisciplinaViewModel @Inject constructor(
     }
 
     fun carregarDeArquivoHtml(filePath: String) {
+        Log.d("DisciplinaViewModel", "Carregando disciplinas do arquivo: $filePath")
         viewModelScope.launch {
             _disciplinas.value = emptyList() // Limpa a lista antes de carregar novas disciplinas
             val tabelas = fileProcessor.extrairTabelasDeHtml(filePath)
