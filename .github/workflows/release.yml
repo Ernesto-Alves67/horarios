@@ -2,7 +2,6 @@ name: Build and publish release
 
 on:
   push:
-    branches: [ "dev"]
     tags:
       - 'v*'
   workflow_dispatch:
@@ -18,11 +17,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '11'
+          java-version: '17'
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -34,6 +33,15 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x gradlew
+
+      - name: Diagnostic: Java and Gradle versions
+        run: |
+          echo "--- java -version ---"
+          java -version || true
+          echo "--- javac -version ---"
+          javac -version || true
+          echo "--- gradle wrapper version ---"
+          ./gradlew --version || true
 
       - name: Build release APK and AAB
         run: ./gradlew :app:assembleRelease :app:bundleRelease --no-daemon --stacktrace
