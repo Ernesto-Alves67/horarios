@@ -47,7 +47,7 @@ jobs:
 
       # 🔑 Decodifica o keystore a partir do secret base64
       - name: Decode keystore from secrets
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > horarios-release-key.jks
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > app/horarios-release-key.jks
 
       # 🏗️ Build do release já assinado
       - name: Build signed release APK
