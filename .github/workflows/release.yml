@@ -69,7 +69,7 @@ jobs:
 
       # 🚀 Criação do release fixo com a tag v1.0.0
       - name: Create GitHub Release and upload artifacts
-        uses: softprops/action-gh-release@v1.1.14
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v1.0.0
           name: Horarios v1.0.0
