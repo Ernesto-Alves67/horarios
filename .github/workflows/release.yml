@@ -45,24 +45,37 @@ jobs:
           echo "--- gradle wrapper version ---"
           ./gradlew --version || true
 
-      - name: Build release APK and AAB
-        run: ./gradlew :app:assembleRelease :app:bundleRelease --no-daemon --stacktrace
+      # 🔑 Decodifica o keystore a partir do secret base64
+      - name: Decode keystore from secrets
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > horarios-release-key.jks
 
+      # 🏗️ Build do release já assinado
+      - name: Build signed release APK
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+        env:
+          STORE_FILE: horarios-release-key.jks
+          STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+      # 📤 Upload do APK como artefato da action
       - name: Upload build artifacts to workflow (for debugging)
         uses: actions/upload-artifact@v4
         with:
           name: app-artifacts
           path: |
             app/build/outputs/apk/release/*.apk
-            app/build/outputs/bundle/release/*.aab
+      #            app/build/outputs/bundle/release/*.aab
 
+      # 🚀 Criação do release fixo com a tag v1.0.0
       - name: Create GitHub Release and upload artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v1.1.14
         with:
           tag_name: v1.0.0
           name: Horarios v1.0.0
           files: |
             app/build/outputs/apk/release/*.apk
-            app/build/outputs/bundle/release/*.aab
+          #            app/build/outputs/bundle/release/*.aab
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
