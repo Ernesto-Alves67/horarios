@@ -1,14 +1,13 @@
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByName
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
-// Carregar variáveis do .env
-val envFile = rootProject.file(".env")
-val env = Properties()
+//val envFile = rootProject.file(".env")
+val keystoreProperties = Properties()
+val envFile = rootProject.file("env.properties")
 if (envFile.exists()) {
-    FileInputStream(envFile).use { env.load(it) }
+    keystoreProperties.load(FileInputStream(envFile))
 }
+
 
 plugins {
     alias(libs.plugins.android.application)
@@ -19,6 +18,10 @@ plugins {
     kotlin("kapt")
 }
 
+
+fun getEnvOrProperty(key: String): String? {
+    return System.getenv(key) ?: keystoreProperties.getProperty(key)
+}
 android {
     namespace = "com.scherzolambda.horarios"
     compileSdk = 36
@@ -35,10 +38,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(env.getProperty("STORE_FILE", "horarios-release-key.jks"))
-            storePassword = env.getProperty("STORE_PASSWORD")
-            keyAlias = env.getProperty("KEY_ALIAS")
-            keyPassword = env.getProperty("KEY_PASSWORD")
+            storeFile = file(getEnvOrProperty("STORE_FILE") ?: "horarios-release-key.jks")
+            storePassword = getEnvOrProperty("STORE_PASSWORD")
+            keyAlias = getEnvOrProperty("KEY_ALIAS")
+            keyPassword = getEnvOrProperty("KEY_PASSWORD")
         }
     }
 
