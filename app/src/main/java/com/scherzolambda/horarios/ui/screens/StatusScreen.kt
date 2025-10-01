@@ -48,17 +48,16 @@ fun StatusScreen(
 ) {
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
+    val isLoading by disciplinaViewModel.isLoading.collectAsState()
+    
     var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
     var salvarStatus by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> htmlUri = uri }
     )
-    val isFirstAccess by DataStoreHelper.isFirstAccessFlow(context).collectAsState(initial = true)
     val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
-    val coroutineScope = rememberCoroutineScope()
 
     // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
@@ -75,89 +74,37 @@ fun StatusScreen(
             disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
             salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
             Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
-            coroutineScope.launch {
-                DataStoreHelper.setFileLoaded(context, true)
-            }
+            DataStoreHelper.setFileLoaded(context, true)
         }
     }
-
-    LaunchedEffect(isFirstAccess) {
-        if (isFirstAccess) {
-            DataStoreHelper.setFirstAccess(context, false)
-        }
-    }
-
-    // Carrega disciplinas do cache se já houver arquivo salvo E nenhum arquivo HTML está selecionado
-    LaunchedEffect(isFileLoaded, htmlUri) {
-        if (isFileLoaded && disciplinas.isEmpty() && htmlUri == null) {
-            disciplinaViewModel.carregarDisciplinasLocal()
-            salvarStatus = "Disciplinas carregadas do cache."
-        }
-    }
-
-//    Column(
-//        modifier = Modifier.fillMaxSize().padding(8.dp),
-//        verticalArrangement = Arrangement.Top,
-////        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//
-//        if (disciplinas.isNotEmpty()) {
-//            LazyColumn(
-//                modifier = Modifier.weight(1f).fillMaxWidth(),
-//                verticalArrangement = Arrangement.spacedBy(8.dp)
-//            ) {
-//                items(disciplinas.size) { disciplina ->
-//                    if (disciplinas[disciplina].codigo.isNotEmpty()) {
-//                        Card(
-//                            elevation = CardDefaults.cardElevation(4.dp),
-//                            modifier = Modifier.fillMaxWidth()
-//                        ) {
-//                            Row(
-//                                modifier = Modifier.padding(12.dp),
-//                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-//                            ) {
-//                                Text(disciplinas[disciplina].codigo, style = AppTypography.headlineSmall)
-//                                Text(disciplinas[disciplina].componenteCurricular, style = AppTypography.headlineSmall)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        } else {
-//            Text("Nenhuma tabela encontrada.", modifier = Modifier.padding(8.dp))
-//        }
-//
-//        if (isFirstAccess) {
-//            Text("Bem-vindo! Este é seu primeiro acesso.", modifier = Modifier.padding(8.dp))
-//        }
-//        if (isFileLoaded) {
-//            Text("Um arquivo já foi carregado anteriormente. \n Mas você pode carregar outro.", modifier = Modifier.padding(8.dp))
-//        }
-//        Button(
-//            onClick = { launcher.launch(arrayOf("text/html")) },
-//            modifier = Modifier
-//                .padding(16.dp)
-//                .fillMaxWidth(),
-//            colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen)
-//        ) {
-//            Text("Selecionar arquivo HTML", fontSize = 18.sp)
-//        }
-//    }
 
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        val (lazyListRef, firstAccessRef, fileLoadedRef, buttonRef) = createRefs()
+        val (lazyListRef, fileLoadedRef, buttonRef, loadingRef) = createRefs()
 
-        if (disciplinas.isNotEmpty()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .constrainAs(loadingRef) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+            ) {
+                androidx.compose.material3.CircularProgressIndicator()
+            }
+        } else if (disciplinas.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .constrainAs(lazyListRef) {
                         top.linkTo(parent.top, margin = 16.dp)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+                        bottom.linkTo(fileLoadedRef.top, margin = 8.dp)
                         height = Dimension.fillToConstraints
                     }
                     .fillMaxWidth(),
@@ -195,22 +142,11 @@ fun StatusScreen(
             )
         }
 
-//        if (isFirstAccess) {
-//            Text(
-//                "Bem-vindo! Este é seu primeiro acesso.",
-//                modifier = Modifier.constrainAs(firstAccessRef) {
-//                    top.linkTo(lazyListRef.bottom, margin = 8.dp)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                }.padding(8.dp)
-//            )
-//        }
-
         if (isFileLoaded) {
             Text(
                 "Um arquivo já foi carregado anteriormente. \nMas você pode carregar outro.",
                 modifier = Modifier.constrainAs(fileLoadedRef) {
-                    top.linkTo(lazyListRef.bottom, margin = 8.dp)
+                    bottom.linkTo(buttonRef.top, margin = 8.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }.padding(8.dp)
@@ -221,7 +157,7 @@ fun StatusScreen(
             onClick = { launcher.launch(arrayOf("text/html")) },
             modifier = Modifier
                 .constrainAs(buttonRef) {
-                    top.linkTo(fileLoadedRef.bottom, margin = 24.dp)
+                    bottom.linkTo(parent.bottom, margin = 16.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints

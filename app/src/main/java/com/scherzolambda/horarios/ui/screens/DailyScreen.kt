@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scherzolambda.horarios.data_transformation.HorarioSemanal
@@ -71,25 +72,25 @@ fun DailyScreen(
 ) {
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
-    val disciplinasHoje = getTodayClasses(disciplinas)
+    val isLoading by disciplinaViewModel.isLoading.collectAsState()
+    
+    // Deriva o horário semanal do estado de disciplinas
+    val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
+    val disciplinasHoje = remember(horariosSemanalState) {
+        getTodayClasses(horariosSemanalState)
+    }
+    
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
 
-    var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
-    var salvarStatus by remember { mutableStateOf<String?>(null) }
-    val context = LocalContext.current
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri -> htmlUri = uri }
-    )
-    val isFirstAccess by DataStoreHelper.isFirstAccessFlow(context).collectAsState(initial = true)
-    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
-    val coroutineScope = rememberCoroutineScope()
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-    ) {
-
-        if (disciplinas.isEmpty()) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator()
+            }
+        } else if (disciplinas.isEmpty()) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -98,15 +99,11 @@ fun DailyScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text("Nenhuma disciplina encontrada.", modifier = Modifier.padding(8.dp))
-                androidx.compose.material3.Button(
-                    onClick = { launcher.launch(arrayOf("text/html")) },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(containerColor = com.scherzolambda.horarios.ui.theme.UFCATGreen)
-                ) {
-                    Text("Selecionar arquivo HTML", fontSize = 18.sp)
-                }
+                Text(
+                    "Por favor, vá para a aba 'Status' ou 'SIGAA' para carregar seus horários.",
+                    modifier = Modifier.padding(8.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             }
         } else {
             // Header fixo no topo
@@ -133,7 +130,6 @@ fun DailyScreen(
                 )
             }
 
-
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -154,7 +150,6 @@ fun DailyScreen(
                 Spacer(modifier = Modifier.padding(8.dp))
             }
         }
-
 
         // Dialog (fora da área rolável) para ficar acima do conteúdo quando aberto
         if (selectedCell != null) {
@@ -182,7 +177,6 @@ fun DailyScreen(
                 text = {
                     Column(modifier = Modifier.padding(4.dp)) {
                         if (selectedCell!!.local.isNotBlank()) {
-
                             DialogInfoRow("Local", selectedCell!!.local)
                         }
                         DialogInfoRow("Horário",HourMaps.getHourRange(selectedCell!!.periodo, selectedCell!!.horario))
@@ -191,34 +185,6 @@ fun DailyScreen(
                 }
             )
         }
-
-        // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
-        LaunchedEffect(htmlUri) {
-            htmlUri?.let { uri ->
-                val tempFile = withContext(Dispatchers.IO) {
-                    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-                    val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
-                    val outputStream = tempFile.outputStream()
-                    inputStream?.copyTo(outputStream)
-                    inputStream?.close()
-                    outputStream.close()
-                    tempFile
-                }
-                disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
-                salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
-                Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
-                coroutineScope.launch {
-                    DataStoreHelper.setFileLoaded(context, true)
-                }
-            }
-        }
-
-        LaunchedEffect(isFirstAccess) {
-            if (isFirstAccess) {
-                DataStoreHelper.setFirstAccess(context, false)
-            }
-        }
-
     }
 }
 
