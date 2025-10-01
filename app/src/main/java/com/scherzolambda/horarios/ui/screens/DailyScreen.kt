@@ -57,6 +57,7 @@ import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
+import com.scherzolambda.horarios.data_transformation.getTodayClasses2
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
@@ -77,7 +78,7 @@ fun DailyScreen(
     // Deriva o horário semanal do estado de disciplinas
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
     val disciplinasHoje = remember(horariosSemanalState) {
-        getTodayClasses(horariosSemanalState)
+        getTodayClasses2(horariosSemanalState)
     }
     
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }

@@ -1,5 +1,14 @@
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByName
+import java.util.Properties
+import java.io.FileInputStream
+
+// Carregar variáveis do .env
+val envFile = rootProject.file(".env")
+val env = Properties()
+if (envFile.exists()) {
+    FileInputStream(envFile).use { env.load(it) }
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -26,10 +35,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("STORE_FILE") ?: "horarios-release-key.jks")
-            storePassword = System.getenv("STORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            storeFile = file(env.getProperty("STORE_FILE", "horarios-release-key.jks"))
+            storePassword = env.getProperty("STORE_PASSWORD")
+            keyAlias = env.getProperty("KEY_ALIAS")
+            keyPassword = env.getProperty("KEY_PASSWORD")
         }
     }
 

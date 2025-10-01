@@ -135,6 +135,6 @@ fun getTodayClasses(disciplinas: List<Disciplina>): List<HorarioSemanal> {
  * @param horarios Lista de horários semanais já processados
  * @return Lista de horários semanais que ocorrem no dia atual da semana
  */
-fun getTodayClasses(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
+fun getTodayClasses2(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
     return filtrarHorariosDoDiaAtual(horarios)
 }

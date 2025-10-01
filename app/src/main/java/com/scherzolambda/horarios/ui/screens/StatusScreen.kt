@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -146,7 +147,7 @@ fun StatusScreen(
             Text(
                 "Um arquivo já foi carregado anteriormente. \nMas você pode carregar outro.",
                 modifier = Modifier.constrainAs(fileLoadedRef) {
-                    bottom.linkTo(buttonRef.top, margin = 8.dp)
+                    top.linkTo(lazyListRef.bottom, margin = 32.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }.padding(8.dp)
@@ -157,7 +158,7 @@ fun StatusScreen(
             onClick = { launcher.launch(arrayOf("text/html")) },
             modifier = Modifier
                 .constrainAs(buttonRef) {
-                    bottom.linkTo(parent.bottom, margin = 16.dp)
+                    top.linkTo(fileLoadedRef.bottom, margin = 16.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
