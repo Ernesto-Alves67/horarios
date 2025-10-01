@@ -39,7 +39,7 @@ class FileProcessor {
 
         // 1. Carregar o documento HTML
         val doc = try {
-            Jsoup.parse(File(filePath), "windows-1252")//ISO-8859-1
+            Jsoup.parse(File(filePath), null)//ISO-8859-1
         } catch (e: Exception) {
             println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
             return emptyList()

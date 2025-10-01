@@ -1,10 +1,12 @@
 package com.scherzolambda.horarios.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +25,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,15 +32,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-
 import androidx.constraintlayout.compose.Dimension
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.UFCATGreen
-import com.scherzolambda.horarios.ui.theme.UfcatOrange
+import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 
@@ -84,7 +83,7 @@ fun StatusScreen(
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        val (lazyListRef, fileLoadedRef, buttonRef, loadingRef) = createRefs()
+        val (lazyListRef, fileLoadedRef, loadingRef) = createRefs()
 
         if (isLoading) {
             Box(
@@ -99,13 +98,24 @@ fun StatusScreen(
                 androidx.compose.material3.CircularProgressIndicator()
             }
         } else if (disciplinas.isNotEmpty()) {
-            LazyColumn(
+            Log.d("StatusScreen", "Exibindo ${disciplinas.size} disciplinas")
+            StatusInfoCard(
+                title = "Arquivo carregado",
+                info = "",
+                textButton = "Alterar arquivo HTML",
                 modifier = Modifier
-                    .constrainAs(lazyListRef) {
+                    .constrainAs(fileLoadedRef) {
                         top.linkTo(parent.top, margin = 16.dp)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
-                        bottom.linkTo(fileLoadedRef.top, margin = 8.dp)
+                    },
+                onClickButton = { launcher.launch(arrayOf("text/html")) })
+            LazyColumn(
+                modifier = Modifier
+                    .constrainAs(lazyListRef) {
+                        top.linkTo(fileLoadedRef.bottom, margin = 16.dp)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
                         height = Dimension.fillToConstraints
                     }
                     .fillMaxWidth(),
@@ -132,40 +142,61 @@ fun StatusScreen(
                     }
                 }
             }
-        } else {
-            Text(
-                "Nenhuma tabela encontrada.",
-                modifier = Modifier.constrainAs(lazyListRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }.padding(8.dp)
+
+
+        }
+        else {
+            Log.d("StatusScreen", "Nenhuma disciplina para exibir")
+
+            StatusInfoCard(
+                title = "Nenhum arquivo carregado",
+                info = "Por favor, selecione um arquivo HTML.",
+                textButton = "Selecionar arquivo HTML",
+                modifier = Modifier
+                    .constrainAs(fileLoadedRef) {
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    },
+                onClickButton = { launcher.launch(arrayOf("text/html")) }
             )
         }
+    }
+}
 
-        if (isFileLoaded) {
-            Text(
-                "Um arquivo já foi carregado anteriormente. \nMas você pode carregar outro.",
-                modifier = Modifier.constrainAs(fileLoadedRef) {
-                    top.linkTo(lazyListRef.bottom, margin = 32.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }.padding(8.dp)
-            )
-        }
-
-        Button(
-            onClick = { launcher.launch(arrayOf("text/html")) },
+@Composable
+fun StatusInfoCard(
+    title: String,
+    info: String,
+    textButton: String,
+    modifier: Modifier = Modifier,
+    onClickButton: (() -> Unit)
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column (
             modifier = Modifier
-                .constrainAs(buttonRef) {
-                    top.linkTo(fileLoadedRef.bottom, margin = 16.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
-            colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen)
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Selecionar arquivo HTML", fontSize = 18.sp)
+            Text(title, style = AppTypography.headlineSmall)
+            Spacer(modifier = Modifier.size(8.dp))
+            if (!(info.isEmpty())){
+                Text(info, style = AppTypography.bodyMedium)
+            }
+
+            Button(
+                onClick = { onClickButton() },
+                colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen, contentColor = UfcatBlack)
+            ) {
+                Text(textButton, fontSize = 18.sp)
+            }
         }
     }
 }
