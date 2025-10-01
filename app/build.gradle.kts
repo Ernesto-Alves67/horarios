@@ -1,5 +1,13 @@
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.getByName
+import java.io.FileInputStream
+import java.util.Properties
+
+//val envFile = rootProject.file(".env")
+val keystoreProperties = Properties()
+val envFile = rootProject.file("env.properties")
+if (envFile.exists()) {
+    keystoreProperties.load(FileInputStream(envFile))
+}
+
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,6 +18,10 @@ plugins {
     kotlin("kapt")
 }
 
+
+fun getEnvOrProperty(key: String): String? {
+    return System.getenv(key) ?: keystoreProperties.getProperty(key)
+}
 android {
     namespace = "com.scherzolambda.horarios"
     compileSdk = 36
@@ -19,17 +31,17 @@ android {
         minSdk = 28
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("STORE_FILE") ?: "horarios-release-key.jks")
-            storePassword = System.getenv("STORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+            storeFile = file(getEnvOrProperty("STORE_FILE") ?: "horarios-release-key.jks")
+            storePassword = getEnvOrProperty("STORE_PASSWORD")
+            keyAlias = getEnvOrProperty("KEY_ALIAS")
+            keyPassword = getEnvOrProperty("KEY_PASSWORD")
         }
     }
 
@@ -43,6 +55,18 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        getByName("debug") {
+            isDebuggable =  true
+
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+
+            isMinifyEnabled = false
+            isShrinkResources = false
+
+        }
+
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

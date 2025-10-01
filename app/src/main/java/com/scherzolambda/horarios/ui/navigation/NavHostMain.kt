@@ -105,7 +105,7 @@ fun MainNavigation() {
                     html.trim('"') // fallback simples
                 }
                 Log.d("Download", "HTML decodificado: $decodedHtml")
-                val metaTag = "<meta http-equiv=\"content-type\" content=\"text/html; charset=windows-1252\">"
+                val metaTag = "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">"
                 val headIndex = decodedHtml.indexOf("<head>")
                 val htmlWithMeta = if (headIndex != -1 && !decodedHtml.contains(metaTag)) {
                     decodedHtml.replaceFirst("<head>", "<head>$metaTag")
@@ -132,10 +132,18 @@ fun MainNavigation() {
                 val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
                 if (uri != null) {
                     try {
-                        resolver.openOutputStream(uri)?.use { it.write(htmlWithMeta.toByteArray()) }
+                        resolver.openOutputStream(uri)?.use { it.write(htmlWithMeta.toByteArray(
+                            Charsets.UTF_8)) }
                         val filePath = getFilePathFromUri(context, uri) ?: uri.toString()
                         disciplinaViewModel.carregarDeArquivoHtml(filePath)
                         Toast.makeText(context, "Página salva e carregada!", Toast.LENGTH_LONG).show()
+                        navController.navigate(Screen.Daily.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     } catch (e: Exception) {
                         Toast.makeText(context, "Erro ao salvar/carregar: ${e.message}", Toast.LENGTH_LONG).show()
                     }
