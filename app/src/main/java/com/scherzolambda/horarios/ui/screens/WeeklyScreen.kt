@@ -50,20 +50,25 @@ fun WeeklyScreen(
     paddingValues: PaddingValues,
     disciplinaViewModel: DisciplinaViewModel
 ) {
-    val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
-    val disciplinas = disciplinasState.value
-    Log.d("WeeklyScreen", "Disciplinas lidas: $disciplinas")
+    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
+    val isLoading by disciplinaViewModel.isLoading.collectAsState()
 
-    val horarios = disciplinaViewModel.getWeeklySchedule()
-    Log.d("WeeklyScreen", "Horários gerados: $horarios")
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
-//            .padding(paddingValues)
             .padding(4.dp)
             .fillMaxHeight()
     ) {
-        WeeklyScheduleOptimizedFinalNoEmpty(horarios)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                androidx.compose.material3.CircularProgressIndicator()
+            }
+        } else {
+            WeeklyScheduleOptimizedFinalNoEmpty(horarios)
+        }
     }
 }
 
