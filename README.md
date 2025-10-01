@@ -12,8 +12,12 @@ Aplicação para facilitar a vizualização de horários da Universidade Federal
 
 # Overview
 
-<img width="279"  src="https://github.com/user-attachments/assets/c396d5e6-0f98-462e-a30d-0b650ee38dee" />
+<img width="279" height="620" alt="image" src="https://github.com/user-attachments/assets/195db0c0-ef90-4131-96c5-d6435e15915d" />
 
 <img width="279"  src="https://github.com/user-attachments/assets/a4526f1d-d3b6-42c9-9a58-c27ea51ded75" />
 
 <img width="279" src="https://github.com/user-attachments/assets/a589a5de-0ab3-43fd-8f79-48a98efbc056" />
+
+<img width="279"  src="https://github.com/user-attachments/assets/e8e6aee4-94a2-42f4-8b2e-5466d82245a4" />
+
+
