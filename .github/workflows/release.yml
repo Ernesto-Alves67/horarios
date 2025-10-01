@@ -3,7 +3,7 @@ name: Build and publish release
 on:
   push:
     branches:
-      - "dev"
+      - "dev-not"
     tags:
       - 'v*'
   workflow_dispatch:
