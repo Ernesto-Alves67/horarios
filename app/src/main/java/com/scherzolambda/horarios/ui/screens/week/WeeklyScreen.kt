@@ -1,6 +1,5 @@
-package com.scherzolambda.horarios.ui.screens
+package com.scherzolambda.horarios.ui.screens.week
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,19 +35,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.scherzolambda.horarios.data_transformation.HorarioSemanal
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
 import com.scherzolambda.horarios.ui.theme.AppTypography
+import com.scherzolambda.horarios.ui.theme.LocalAppColors
+import com.scherzolambda.horarios.ui.theme.M_PeriodColor
+import com.scherzolambda.horarios.ui.theme.N_PeriodColor
+import com.scherzolambda.horarios.ui.theme.T_PeriodColor
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
+import com.scherzolambda.horarios.ui.theme.UfcatGray
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 
 @Composable
 fun WeeklyScreen(
-    paddingValues: PaddingValues,
     disciplinaViewModel: DisciplinaViewModel
 ) {
     val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
@@ -58,23 +62,24 @@ fun WeeklyScreen(
         modifier = Modifier
             .padding(4.dp)
             .fillMaxHeight()
+            .background(LocalAppColors.current.content.background)
     ) {
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.CircularProgressIndicator()
+                CircularProgressIndicator()
             }
         } else {
-            WeeklyScheduleOptimizedFinalNoEmpty(horarios)
+            WeeklySchedule(horarios)
         }
     }
 }
 
 
 @Composable
-fun WeeklyScheduleOptimizedFinalNoEmpty(horarios: List<HorarioSemanal>) {
+fun WeeklySchedule(horarios: List<HorarioSemanal>) {
     val diasUteis = DaysOfWeekMap.days.filterKeys { it in 2..6 }
     val periodos = listOf(HourType.M, HourType.T)
     val horariosPorPeriodo = mapOf(
@@ -82,7 +87,6 @@ fun WeeklyScheduleOptimizedFinalNoEmpty(horarios: List<HorarioSemanal>) {
         HourType.T to HourMaps.T.keys
     )
 
-    // Lookup O(1)
     val horariosMap by remember(horarios) {
         mutableStateOf(horarios.associateBy { Triple(it.diaSemana, it.periodo, it.horario) })
     }
@@ -93,14 +97,13 @@ fun WeeklyScheduleOptimizedFinalNoEmpty(horarios: List<HorarioSemanal>) {
         // Cabeçalho fixo
         DaysOfWeekHeader(diasUteis.values.toList())
 
-        // Cria lista apenas com células não vazias
         val gridItems = remember(diasUteis, periodos, horariosPorPeriodo, horariosMap) {
             val list = mutableListOf<Triple<String, Color, HorarioSemanal?>>()
             periodos.forEach { periodo ->
                 val periodoColor = when (periodo) {
-                    HourType.M -> Color(0xFFE3F2FD)
-                    HourType.T -> Color(0xFFFFF9C4)
-                    HourType.N -> Color(0xFFFFCDD2)
+                    HourType.M -> M_PeriodColor
+                    HourType.T -> T_PeriodColor
+                    HourType.N -> N_PeriodColor
                 }
                 horariosPorPeriodo[periodo]?.forEach { horarioNum ->
                     diasUteis.keys.forEach { diaKey ->
@@ -134,7 +137,6 @@ fun WeeklyScheduleOptimizedFinalNoEmpty(horarios: List<HorarioSemanal>) {
                                 .background(color, shape = RoundedCornerShape(4.dp))
                                 .padding(2.dp)
                                 .clickable {
-                                    // Ao clicar, exibe o Dialog de detalhes
                                     celula?.let {
                                         selectedCell = it
                                     }
@@ -155,11 +157,9 @@ fun WeeklyScheduleOptimizedFinalNoEmpty(horarios: List<HorarioSemanal>) {
             }
         }
 
-        // Dialog de detalhes com X no canto superior direito
         selectedCell?.let { cell ->
             AlertDialog(
                 onDismissRequest = { selectedCell = null },
-                // removemos botões padrão e colocamos um X no título
                 confirmButton = { /* nenhum botão */ },
                 title = {
                     Box(modifier = Modifier.fillMaxWidth()) {

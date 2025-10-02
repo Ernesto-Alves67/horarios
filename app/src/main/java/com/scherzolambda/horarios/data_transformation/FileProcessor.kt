@@ -73,7 +73,6 @@ class FileProcessor {
                         val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
                         Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
                         val disciplina = Disciplina(
-                            // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
                             docente = docente,

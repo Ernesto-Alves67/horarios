@@ -1,9 +1,11 @@
-package com.scherzolambda.horarios.ui.screens
+package com.scherzolambda.horarios.ui.screens.status
 
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,12 +38,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.ui.theme.AppTypography
-import com.scherzolambda.horarios.ui.theme.UFCATGreen
+import com.scherzolambda.horarios.ui.theme.LocalAppColors
+import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream
+import kotlin.io.path.createTempFile
 
 @Composable
 fun StatusScreen(
@@ -50,7 +55,7 @@ fun StatusScreen(
     val disciplinas = disciplinasState.value
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
 
-    var htmlUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    var htmlUri by remember { mutableStateOf<Uri?>(null) }
     var salvarStatus by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(
@@ -64,7 +69,7 @@ fun StatusScreen(
         htmlUri?.let { uri ->
             val tempFile = withContext(Dispatchers.IO) {
                 val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-                val tempFile = kotlin.io.path.createTempFile(suffix = ".html").toFile()
+                val tempFile = createTempFile(suffix = ".html").toFile()
                 val outputStream = tempFile.outputStream()
                 inputStream?.copyTo(outputStream)
                 inputStream?.close()
@@ -95,7 +100,7 @@ fun StatusScreen(
                         end.linkTo(parent.end)
                     }
             ) {
-                androidx.compose.material3.CircularProgressIndicator()
+                CircularProgressIndicator()
             }
         } else if (disciplinas.isNotEmpty()) {
             Log.d("StatusScreen", "Exibindo ${disciplinas.size} disciplinas")
@@ -117,8 +122,7 @@ fun StatusScreen(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         height = Dimension.fillToConstraints
-                    }
-                    .fillMaxWidth(),
+                    }.padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(disciplinas.size) { index ->
@@ -126,18 +130,25 @@ fun StatusScreen(
                     if (disciplina.codigo.isNotEmpty()) {
                         Card(
                             elevation = CardDefaults.cardElevation(4.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.content.whiteText)
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Text(disciplina.codigo, style = AppTypography.headlineSmall)
+                                Text(disciplina.codigo,
+                                    style = AppTypography.labelMedium,
+                                    color = LocalAppColors.current.content.blackText)
                                 Text(
                                     disciplina.componenteCurricular,
-                                    style = AppTypography.headlineSmall
+                                    style = AppTypography.labelMedium,
+                                    color = LocalAppColors.current.content.blackText
                                 )
                             }
+                        }
+                        if(index== disciplinas.size-1){
+                            Spacer(modifier = Modifier.size(8.dp))
                         }
                     }
                 }
@@ -176,7 +187,8 @@ fun StatusInfoCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.content.whiteText)
     ) {
         Column (
             modifier = Modifier
@@ -185,17 +197,22 @@ fun StatusInfoCard(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(title, style = AppTypography.headlineSmall)
+            Text(title,
+                style = AppTypography.headlineSmall,
+                color = LocalAppColors.current.content.blackText)
             Spacer(modifier = Modifier.size(8.dp))
             if (!(info.isEmpty())){
-                Text(info, style = AppTypography.bodyMedium)
+                Text(info,
+                    style = AppTypography.bodyMedium,
+                    color = LocalAppColors.current.content.blackText)
             }
 
             Button(
                 onClick = { onClickButton() },
-                colors = ButtonDefaults.buttonColors(containerColor = UFCATGreen, contentColor = UfcatBlack)
+                colors = ButtonDefaults.buttonColors(containerColor = UfcatGreen, contentColor = UfcatBlack)
             ) {
-                Text(textButton, fontSize = 18.sp)
+                Text(textButton, fontSize = 18.sp,
+                    color = LocalAppColors.current.content.blackText)
             }
         }
     }

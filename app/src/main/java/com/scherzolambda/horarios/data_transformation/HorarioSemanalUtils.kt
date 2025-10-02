@@ -1,6 +1,7 @@
 package com.scherzolambda.horarios.data_transformation
 
 import com.scherzolambda.horarios.data_transformation.enums.HourType
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import java.time.LocalDate
 
 

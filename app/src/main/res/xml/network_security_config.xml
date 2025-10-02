@@ -1,5 +1,5 @@
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="false">
+    <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">sigaa.sistemas.ufcat.edu.br</domain>
         <trust-anchors>
             <certificates src="system" />

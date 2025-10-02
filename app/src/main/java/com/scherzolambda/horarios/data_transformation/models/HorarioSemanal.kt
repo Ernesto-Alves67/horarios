@@ -1,4 +1,4 @@
-package com.scherzolambda.horarios.data_transformation
+package com.scherzolambda.horarios.data_transformation.models
 
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 

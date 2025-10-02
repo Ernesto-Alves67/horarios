@@ -1,7 +1,5 @@
 package com.scherzolambda.horarios.data_transformation
 
-import android.util.Log
-
 class DataPreparation {
 
     fun decomporMultiplosCodigos(texto: String): List<Triple<String, String, String>> {
@@ -23,4 +21,6 @@ class DataPreparation {
 //        Log.d("DataPreparation", "Encontradas ${resultados.size} correspondências na string: \"$texto\"")
         return resultados
     }
+
+    // TODO: função apra abreviar nomes de disciplinas
 }
