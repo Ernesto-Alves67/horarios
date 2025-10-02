@@ -12,12 +12,18 @@ Aplicação para facilitar a vizualização de horários da Universidade Federal
 
 # Overview
 
-<img width="279" height="620" alt="image" src="https://github.com/user-attachments/assets/195db0c0-ef90-4131-96c5-d6435e15915d" />
+<img width="279"  src="https://github.com/user-attachments/assets/4429eefb-4b0b-4eac-9a96-6d8f60640d22" />
 
-<img width="279"  src="https://github.com/user-attachments/assets/a4526f1d-d3b6-42c9-9a58-c27ea51ded75" />
+<img width="279"  src="https://github.com/user-attachments/assets/82c94305-9bc4-43a5-beb2-319133239217" />
 
-<img width="279" src="https://github.com/user-attachments/assets/a589a5de-0ab3-43fd-8f79-48a98efbc056" />
+<img width="279"  src="https://github.com/user-attachments/assets/9e119ae1-d5ff-4ed4-86f7-3e2f7a3f5ad9" />
 
-<img width="279"  src="https://github.com/user-attachments/assets/e8e6aee4-94a2-42f4-8b2e-5466d82245a4" />
+---
+
+<img width="279" src="https://github.com/user-attachments/assets/99c2071a-718c-45ae-adb9-ce8743ee560a" />
+
+<img width="279" src="https://github.com/user-attachments/assets/3414aef8-4b92-4432-8689-582cd40e05ac" />
+
+<img width="279"  src="https://github.com/user-attachments/assets/6b290efe-813b-4e78-8810-4487cd60bf10" />
 
 
