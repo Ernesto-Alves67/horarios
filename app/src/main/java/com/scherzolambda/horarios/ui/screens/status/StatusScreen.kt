@@ -62,7 +62,7 @@ fun StatusScreen(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> htmlUri = uri }
     )
-    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
+//    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
 
     // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
@@ -212,7 +212,7 @@ fun StatusInfoCard(
                 colors = ButtonDefaults.buttonColors(containerColor = UfcatGreen, contentColor = UfcatBlack)
             ) {
                 Text(textButton, fontSize = 18.sp,
-                    color = LocalAppColors.current.content.blackText)
+                    color = LocalAppColors.current.content.white)
             }
         }
     }

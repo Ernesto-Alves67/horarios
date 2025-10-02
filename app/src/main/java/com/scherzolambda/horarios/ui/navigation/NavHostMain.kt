@@ -172,7 +172,7 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String) {
             key(screen.route) {
                 val selected = index == selectedIndex
                 val icon = painterResource(screen.iconRes)
-                val fontWeight by animateIntAsState(targetValue = if (selected) 700 else 400)
+//                    val fontWeight by animateIntAsState(targetValue = if (selected) 700 else 400)
 
                 NavigationBarItem(
                     selected = selected,
@@ -191,7 +191,7 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String) {
                         Text(
                             text = screen.label,
                             fontSize = 18.sp,
-                            fontWeight = FontWeight(fontWeight),
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
                             color = if (selected) UfcatBlack else Color.White.copy(alpha = 0.7f)
                         )
                     },
@@ -213,7 +213,6 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String) {
         }
     }
 }
-
 
 
 @Composable

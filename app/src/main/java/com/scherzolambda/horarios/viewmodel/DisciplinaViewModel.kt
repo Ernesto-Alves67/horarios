@@ -10,6 +10,7 @@ import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
 import android.util.Log
+import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.montarHorariosSemanaisDeDisciplinas
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ class DisciplinaViewModel @Inject constructor(
                 tabelas.firstOrNull { it.isNotEmpty() } ?: emptyList()
             }
             _disciplinas.value = disciplinas
+            DataStoreHelper.setFileLoaded(context, true)
             salvarDisciplinasLocal(disciplinas)
             _isLoading.value = false
         }

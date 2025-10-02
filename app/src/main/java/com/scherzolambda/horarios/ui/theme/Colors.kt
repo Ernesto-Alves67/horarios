@@ -40,7 +40,8 @@ data class ContentColors(
     val whiteText: Color = White,
     val blackText: Color = UfcatBlack,
     val grayElements: Color = UfcatGray,
-    val background: Color = White
+    val background: Color = White,
+    val white: Color = White,
 //    val transparent: Color = Transparent,
 //    val textPrimary: Color,
 //    val textSecondary: Color,
@@ -50,7 +51,6 @@ data class ContentColors(
 //    val backgroundSettings: Color,
 //    val backgroundCardProfile: Color,
 //    val lineDivider: Color,
-//    val white: Color = White,
 //    val cardBackgroud: Color,
 //    val componentText: Color,
 
