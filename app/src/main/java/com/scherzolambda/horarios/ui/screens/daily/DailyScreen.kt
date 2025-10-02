@@ -90,11 +90,14 @@ fun DailyScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Nenhuma disciplina encontrada.", modifier = Modifier.padding(8.dp))
+                Text("Nenhuma disciplina encontrada.",
+                    modifier = Modifier.padding(8.dp),
+                    color = LocalAppColors.current.content.blackText)
                 Text(
                     "Por favor, vá para a aba 'Status' ou 'SIGAA' para carregar seus horários.",
                     modifier = Modifier.padding(8.dp),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    color = LocalAppColors.current.content.blackText
                 )
             }
         } else {

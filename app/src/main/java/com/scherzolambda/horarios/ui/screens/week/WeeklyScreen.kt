@@ -1,5 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.week
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,10 +33,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
@@ -56,6 +60,7 @@ fun WeeklyScreen(
 ) {
     val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
+    val context = LocalContext.current
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -72,14 +77,16 @@ fun WeeklyScreen(
                 CircularProgressIndicator()
             }
         } else {
-            WeeklySchedule(horarios)
+            WeeklySchedule(horarios,context)
         }
     }
 }
 
 
 @Composable
-fun WeeklySchedule(horarios: List<HorarioSemanal>) {
+fun WeeklySchedule(
+    horarios: List<HorarioSemanal>,
+    context: Context) {
     val diasUteis = DaysOfWeekMap.days.filterKeys { it in 2..6 }
     val periodos = listOf(HourType.M, HourType.T)
     val horariosPorPeriodo = mapOf(
@@ -92,8 +99,10 @@ fun WeeklySchedule(horarios: List<HorarioSemanal>) {
     }
 
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
-
-    Column(modifier = Modifier.fillMaxSize()) {
+    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(false)
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .background(LocalAppColors.current.content.background)) {
         // Cabeçalho fixo
         DaysOfWeekHeader(diasUteis.values.toList())
 
@@ -115,8 +124,8 @@ fun WeeklySchedule(horarios: List<HorarioSemanal>) {
             list
         }
 
-        if (gridItems.isNotEmpty()) {
-            LazyVerticalGrid(
+       when (isFileLoaded) {
+            true -> LazyVerticalGrid(
                 columns = GridCells.Fixed(diasUteis.size),
                 modifier = Modifier
                     .fillMaxSize()
@@ -155,6 +164,13 @@ fun WeeklySchedule(horarios: List<HorarioSemanal>) {
                     }
                 }
             }
+            false -> MessageInfoCard(
+                title = "Nenhum horário disponível",
+                info = "Parece que não há disciplinas cadastradas no momento.",
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            )
         }
 
         selectedCell?.let { cell ->
@@ -214,6 +230,44 @@ fun DialogInfoRow(label: String, value: String?) {
                 style = AppTypography.bodyLarge,
                 modifier = Modifier.weight(2f)
             )
+        }
+    }
+}
+
+@Composable
+fun MessageInfoCard(
+    title: String,
+    info: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(LocalAppColors.current.content.whiteText,
+                shape = RoundedCornerShape(8.dp))
+            .padding(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = title,
+                style = AppTypography.headlineSmall,
+                color = LocalAppColors.current.content.blackText,
+                textAlign = TextAlign.Center
+            )
+            if (info.isNotEmpty()) {
+                Text(
+                    text = "$info \n Baixe seu comprovante de matricula pela aba 'SIGAA'",
+                    style = AppTypography.bodyMedium,
+                    color = LocalAppColors.current.content.blackText,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
         }
     }
 }
