@@ -1,28 +1,142 @@
 package com.scherzolambda.horarios.data_transformation
 
-import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
-import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
+import java.time.LocalDate
 
-// Função utilitária para montar lista de HorarioSemanal a partir de um texto e disciplina
-fun montarHorariosSemanais(textos: List<String>, disciplina: String): List<HorarioSemanal> {
+
+/** Modelo de dados para representar uma disciplina
+ * @param componenteCurricular Nome ou código da disciplina
+ * @param horario Código(s) do horário associado a essa disciplina (pode ser uma String ou uma lista de Strings)
+ * @param local Local onde a disciplina será ministrada
+ */
+fun montarHorariosSemanaisDeDisciplinas(disciplinas: List<Disciplina>): List<HorarioSemanal> {
     val preparer = DataPreparation()
     val horarios = mutableListOf<HorarioSemanal>()
-    for (texto in textos) {
-        val (diaSemanaStr, periodoDiaStr, horarioStr) = preparer.decomporMultiplosCodigos(texto)
-        val diaSemanaInt = diaSemanaStr.toIntOrNull() ?: continue
-        val periodo = try { HourType.valueOf(periodoDiaStr) } catch (e: Exception) { continue }
-        val horarioInt = horarioStr.toIntOrNull() ?: continue
-        val intervalo = HourMaps.getHourMap(periodo)[horarioInt] ?: "Horário inválido"
-        horarios.add(
-            HorarioSemanal(
-                diaSemana = diaSemanaInt,
-                periodo = periodo,
-                horario = horarioInt,
-                intervalo = intervalo,
-                disciplina = disciplina
-            )
-        )
+    for (disciplina in disciplinas) {
+        val codigos = when (disciplina.horario) {
+            is List<*> -> disciplina.horario.filterIsInstance<String>()
+            is String -> listOf(disciplina.horario)
+            else -> emptyList()
+        }
+        for (codigo in codigos) {
+            val correspondencias = preparer.decomporMultiplosCodigos(codigo)
+            for ((diaSemanaStr, periodoDiaStr, horarioStr) in correspondencias) {
+//                println("Disciplina: ${disciplina.componenteCurricular}, Código: $codigo -> Dia: $diaSemanaStr, Período: $periodoDiaStr, Horário: $horarioStr")
+                if(diaSemanaStr.length == 2){
+                    val dia1 = diaSemanaStr[0].toString().toIntOrNull() ?: continue
+                    val dia2 = diaSemanaStr[1].toString().toIntOrNull() ?: continue
+                    val periodo = try { HourType.valueOf(periodoDiaStr) } catch (e: Exception) { continue }
+                    if(horarioStr.length >=2){
+                        val horariosSplit = horarioStr.map { it.toString() }
+                        for(horarioChunk in horariosSplit){
+                            val horarioIntChunk = horarioChunk.toIntOrNull() ?: continue
+                            horarios.add(
+                                HorarioSemanal(
+                                    diaSemana = dia1,
+                                    periodo = periodo,
+                                    horario = horarioIntChunk,
+                                    disciplina = disciplina.componenteCurricular,
+                                    local = disciplina.local,
+                                    docente = disciplina.docente
+                                )
+                            )
+                            horarios.add(
+                                HorarioSemanal(
+                                    diaSemana = dia2,
+                                    periodo = periodo,
+                                    horario = horarioIntChunk,
+                                    disciplina = disciplina.componenteCurricular,
+                                    local = disciplina.local,
+                                    docente = disciplina.docente
+                                )
+                            )
+                        }
+                        continue
+                    }
+                    val horarioInt = horarioStr.toIntOrNull() ?: continue
+                    horarios.add(
+                        HorarioSemanal(
+                            diaSemana = dia1,
+                            periodo = periodo,
+                            horario = horarioInt,
+                            disciplina = disciplina.componenteCurricular,
+                            local = disciplina.local,
+                            docente = disciplina.docente
+                        )
+                    )
+                    horarios.add(
+                        HorarioSemanal(
+                            diaSemana = dia2,
+                            periodo = periodo,
+                            horario = horarioInt,
+                            disciplina = disciplina.componenteCurricular,
+                            local = disciplina.local,
+                            docente = disciplina.docente
+                        )
+                    )
+                    continue
+                }
+                val diaSemanaInt = diaSemanaStr.toIntOrNull() ?: continue
+                val periodo = try { HourType.valueOf(periodoDiaStr) } catch (e: Exception) { continue }
+                if(horarioStr.length >=2){
+                    val horariosSplit = horarioStr.map { it.toString() }
+                    for(horarioChunk in horariosSplit){
+                        val horarioIntChunk = horarioChunk.toIntOrNull() ?: continue
+                        horarios.add(
+                            HorarioSemanal(
+                                diaSemana = diaSemanaInt,
+                                periodo = periodo,
+                                horario = horarioIntChunk,
+                                disciplina = disciplina.componenteCurricular,
+                                local = disciplina.local,
+                                docente = disciplina.docente
+                            )
+                        )
+                    }
+                    continue
+                }
+                val horarioInt = horarioStr.toIntOrNull() ?: continue
+                horarios.add(
+                    HorarioSemanal(
+                        diaSemana = diaSemanaInt,
+                        periodo = periodo,
+                        horario = horarioInt,
+                        disciplina = disciplina.componenteCurricular,
+                        local = disciplina.local,
+                        docente = disciplina.docente
+                    )
+                )
+            }
+        }
     }
     return horarios
+}
+
+/** Filtra os horários para retornar apenas aqueles que correspondem ao dia atual da semana.
+ * Chamada em `getTodayClasses()`
+ * @param horarios Lista de horários semanais a serem filtrados
+ * @return Lista de horários que ocorrem no dia atual da semana
+ */
+fun filtrarHorariosDoDiaAtual(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
+    val diaAtual = LocalDate.now().dayOfWeek.value + 1 // 2=segunda
+    return horarios.filter { it.diaSemana == diaAtual }
+}
+
+/** Obtém as disciplinas que ocorrem hoje a partir de uma lista de disciplinas
+ * @param disciplinas Lista de disciplinas a serem processadas
+ * @return Lista de horários semanais que ocorrem no dia atual da semana
+ */
+fun getTodayClasses(disciplinas: List<Disciplina>): List<HorarioSemanal> {
+    val horarios = montarHorariosSemanaisDeDisciplinas(disciplinas)
+    return filtrarHorariosDoDiaAtual(horarios)
+
+}
+
+/** Sobrecarga de getTodayClasses para aceitar diretamente uma lista de HorarioSemanal
+ * @param horarios Lista de horários semanais já processados
+ * @return Lista de horários semanais que ocorrem no dia atual da semana
+ */
+fun getTodayClasses2(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
+    return filtrarHorariosDoDiaAtual(horarios)
 }

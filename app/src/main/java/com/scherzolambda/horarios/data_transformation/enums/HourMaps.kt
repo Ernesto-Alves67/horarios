@@ -1,6 +1,6 @@
 package com.scherzolambda.horarios.data_transformation.enums
 
-enum class HourType { T, N, M }
+enum class HourType(val type: String) { T("T"), N("N"), M("M") }
 
 object HourMaps {
     val T = mapOf(
@@ -20,7 +20,7 @@ object HourMaps {
     )
     val M = mapOf(
         1 to "07:10-08:00",
-        2 to "08:50-08:45",
+        2 to "08:00-08:45",
         3 to "08:45-09:40",
         4 to "09:45-10:50",
         5 to "10:50-11:40",
@@ -30,6 +30,17 @@ object HourMaps {
         HourType.T -> T
         HourType.N -> N
         HourType.M -> M
+    }
+
+    fun getHourRange(type: HourType, period: Int): String? {
+        val hourMap = getHourMap(type)
+        return hourMap[period]
+    }
+
+    fun getHourName(type: HourType): String = when(type) {
+        HourType.T -> "Tarde"
+        HourType.N -> "Noite"
+        HourType.M -> "Manhã"
     }
 }
 

@@ -2,4 +2,17 @@
 <resources>
 
     <style name="Theme.Horarios" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Splash theme used by the launcher activity. After the splash is dismissed
+         the framework switches to the app theme set in postSplashScreenTheme. -->
+    <style name="Theme.Horarios.Splash" parent="Theme.SplashScreen">
+        <!-- Background color for the splash screen window -->
+        <item name="windowSplashScreenBackground">@color/ufcat_green</item>
+        <!-- Animated icon (use app launcher icon or a dedicated drawable) -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_ufcat_round</item>
+        <!-- Icon background color when the animated icon is shown -->
+        <item name="windowSplashScreenIconBackgroundColor">@color/ufcat_green</item>
+        <!-- Theme to apply after the splash screen is dismissed -->
+        <item name="postSplashScreenTheme">@style/Theme.Horarios</item>
+    </style>
 </resources>

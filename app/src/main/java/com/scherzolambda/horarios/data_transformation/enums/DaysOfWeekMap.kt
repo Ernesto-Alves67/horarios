@@ -6,13 +6,13 @@ package com.scherzolambda.horarios.data_transformation.enums
  */
 object DaysOfWeekMap {
     val days: Map<Int, String> = mapOf(
-        1 to "Segunda",
-        2 to "Terça",
-        3 to "Quarta",
-        4 to "Quinta",
-        5 to "Sexta",
-        6 to "Sábado",
-        7 to "Domingo"
+        2 to "Segunda",
+        3 to "Terça",
+        4 to "Quarta",
+        5 to "Quinta",
+        6 to "Sexta",
+        7 to "Sábado",
+        8 to "Domingo"
     )
 
     /**

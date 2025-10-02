@@ -1,28 +1,31 @@
 package com.scherzolambda.horarios.data_transformation
+import android.util.Log
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
 data class Disciplina(
     val codigo: String,
     val componenteCurricular: String,
+    val docente: String = "",
     val turma: String = "",
     val status: String = "",
-    val horario: String = ""
+    val horario: String = "",
+    val local: String = ""
 )
 
 @Serializable
 data class DisciplinaSerializable(
     val codigo: String,
     val componenteCurricular: String,
+    val docente: String = "",
     val turma: String = "",
     val status: String = "",
-    val horario: String = ""
+    val horario: String = "",
+    val local: String = ""
 )
 
 class FileProcessor {
@@ -36,7 +39,7 @@ class FileProcessor {
 
         // 1. Carregar o documento HTML
         val doc = try {
-            Jsoup.parse(File(filePath), "UTF-8")
+            Jsoup.parse(File(filePath), null)//ISO-8859-1
         } catch (e: Exception) {
             println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
             return emptyList()
@@ -53,21 +56,30 @@ class FileProcessor {
 
         tables.forEachIndexed { tableIndex, table ->
             val disciplinasDaTabela = mutableListOf<Disciplina>()
-            val rows = table.select("tr:gt(0)")
-
+            val rows = table.select("tbody tr")
+//            println("Processando Tabela ${tableIndex + 1} com ${rows} linhas.\n")
             rows.forEach { row ->
 
                 val cells = row.select("td")
-
-                if (cells.size >= 5 && !(tableIndex == 0 || tableIndex == 2)) {
+//                Log.d("FileProcessor", "Tabela ${tableIndex + 1}, Linha: ${row.text()}, Células: ${cells.size}")
+                if ( !(tableIndex == 0 || tableIndex == 2)) {
                     try {
+                        val componenteCurricular = cells[1].select("span.componente").text()
+                        // Remove prefixo "Local:" (caso-insensitivo) e espaços extras, mantendo só o valor do local
+                        val localRaw = cells[1].select("span.local").text()
+                        val local = localRaw.replaceFirst(Regex("(?i)\\s*Local\\s*:\\s*"), "").trim()
+                        val docente = cells[1].select("span.docente").text()
+                        val horarioBruto = cells[4].text()
+                        val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
+                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
                         val disciplina = Disciplina(
-                            // Mapeamento baseado na ordem das colunas:
                             codigo = cells[0].text(),
-                            componenteCurricular = cells[1].text(),
+                            componenteCurricular = componenteCurricular,
+                            docente = docente,
                             turma = cells[2].text(),
                             status = cells[3].text(),
-                            horario = cells[4].text()
+                            horario = horarioLimpo,
+                            local = local
                         )
                         disciplinasDaTabela.add(disciplina)
                     } catch (e: Exception) {
@@ -88,9 +100,11 @@ fun salvarDisciplinasLocal(context: android.content.Context, disciplinas: List<D
             DisciplinaSerializable(
                 codigo = it.codigo,
                 componenteCurricular = it.componenteCurricular,
+                docente = it.docente,
                 turma = it.turma,
                 status = it.status,
-                horario = it.horario
+                horario = it.horario,
+                local = it.local,
             )
         }
         val json = Json.encodeToString(serializaveis)
@@ -113,9 +127,11 @@ fun lerDisciplinasLocal(context: android.content.Context, fileName: String = "di
             Disciplina(
                 codigo = it.codigo,
                 componenteCurricular = it.componenteCurricular,
+                docente = it.docente,
                 turma = it.turma,
                 status = it.status,
-                horario = it.horario
+                horario = it.horario,
+                local = it.local
             )
         }
     } catch (e: Exception) {

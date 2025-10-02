@@ -1,0 +1,81 @@
+name: Build and publish release
+
+on:
+  push:
+    branches:
+      - "main"
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*','**/gradle-wrapper.properties','**/*.kts') }}
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Diagnostic Java and Gradle versions
+        run: |
+          echo "--- java -version ---"
+          java -version || true
+          echo "--- javac -version ---"
+          javac -version || true
+          echo "--- gradle wrapper version ---"
+          ./gradlew --version || true
+
+      # 🔑 Decodifica o keystore a partir do secret base64
+      - name: Decode keystore from secrets
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > app/horarios-release-key.jks
+
+      # 🏗️ Build do release já assinado
+      - name: Build signed release APK
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+        env:
+          STORE_FILE: horarios-release-key.jks
+          STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+      # 📤 Upload do APK como artefato da action
+      - name: Upload build artifacts to workflow (for debugging)
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-artifacts
+          path: |
+            app/build/outputs/apk/release/*.apk
+      #            app/build/outputs/bundle/release/*.aab
+
+      # 🚀 Criação do release fixo com a tag v1.0.0
+      - name: Create GitHub Release and upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.0
+          name: Horarios v1.0.0
+          files: |
+            app/build/outputs/apk/release/*.apk
+          #            app/build/outputs/bundle/release/*.aab
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

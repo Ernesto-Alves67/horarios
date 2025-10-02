@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+  <!-- Info glyph only (no outer circle) -->
+  <!-- dot -->
+  <path
+      android:fillColor="#FFFFFFFF"
+      android:fillType="evenOdd"
+      android:pathData="M 12.1 5.1
+A 1.4 1.4 90 1 0 12.1014 5.1
+Z"/>
+  <!-- vertical bar -->
+  <path
+      android:fillColor="#FFFFFFFF"
+      android:pathData="M 10.7 9.3
+h 2.8
+v 9.8
+h -2.8
+Z
+"/>
+
+  <path
+      android:fillColor="#FFFFFFFF"
+      android:fillType="evenOdd"
+      android:pathData="
+M 1.0387 12.3542
+A 11.1804 11.1804 90 1 0 23.3995 12.3542
+A 11.1804 11.1804 90 1 0 1.0387 12.3542
+Z
+M 3.2748 12.3542
+A 8.9443 8.9443 90 1 1 21.1635 12.3542
+A 8.9443 8.9443 90 1 1 3.2748 12.3542
+Z
+
+"/>
+
+</vector>

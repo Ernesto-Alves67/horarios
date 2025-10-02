@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Use transparent background for adaptive icon so splash window background is visible -->
+    <color name="ic_launcher_ufcat_background">@color/white</color>
+</resources>

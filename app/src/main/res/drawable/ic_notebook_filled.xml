@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+  <!-- Removed the large rounded-rect background so the icon doesn't render a square background -->
+  <path
+      android:pathData="M3,8C3,5.172 3,3.757 3.879,2.879C4.757,2 6.172,2 9,2H15C17.828,2 19.243,2 20.121,2.879C21,3.757 21,5.172 21,8V16C21,18.828 21,20.243 20.121,21.121C19.243,22 17.828,22 15,22H9C6.172,22 4.757,22 3.879,21.121C3,20.243 3,18.828 3,16V8Z"
+      android:fillColor="#ffffffff"
+      android:fillAlpha="0.2"/>
+  <path
+      android:pathData="M8.75,2.012V22.011H7.25V2.012H8.75Z"
+      android:fillColor="#FFFFFF"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M1.25,8C1.25,7.586 1.586,7.25 2,7.25H4C4.414,7.25 4.75,7.586 4.75,8C4.75,8.414 4.414,8.75 4,8.75H2C1.586,8.75 1.25,8.414 1.25,8ZM1.25,12C1.25,11.586 1.586,11.25 2,11.25H4C4.414,11.25 4.75,11.586 4.75,12C4.75,12.414 4.414,12.75 4,12.75H2C1.586,12.75 1.25,12.414 1.25,12ZM1.25,16C1.25,15.586 1.586,15.25 2,15.25H4C4.414,15.25 4.75,15.586 4.75,16C4.75,16.414 4.414,16.75 4,16.75H2C1.586,16.75 1.25,16.414 1.25,16Z"
+      android:fillColor="#FFFFFFFF"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M10.75,6.5C10.75,6.086 11.086,5.75 11.5,5.75H16.5C16.914,5.75 17.25,6.086 17.25,6.5C17.25,6.914 16.914,7.25 16.5,7.25H11.5C11.086,7.25 10.75,6.914 10.75,6.5Z"
+      android:fillColor="#FFFFFFFF"/>
+  <path
+      android:pathData="M10.75,10C10.75,9.586 11.086,9.25 11.5,9.25H16.5C16.914,9.25 17.25,9.586 17.25,10C17.25,10.414 16.914,10.75 16.5,10.75H11.5C11.086,10.75 10.75,10.414 10.75,10Z"
+      android:fillColor="#FFFFFFFF"/>
+</vector>
