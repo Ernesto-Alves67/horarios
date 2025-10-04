@@ -4,7 +4,7 @@ Aplicação para facilitar a vizualização de horários da Universidade Federal
 
 ---
 ## Como usar:
-- [Baixe o apk](https://github.com/Ernesto-Alves67/horarios/releases/download/dev/horarios-v1.0.0.apk)
+- [Baixe o apk](https://github.com/Ernesto-Alves67/horarios/releases/download/v1.10.0/app-release.apk)
 - Gere seu comprovante de matricula no Sigaa e baixe a pagina html gerada.
 ## Funcionalidades:
 - Vizualização das aulas do dia
