@@ -99,7 +99,7 @@ fun WeeklySchedule(
     }
 
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
-    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(false)
+    val isFileLoaded by DataStoreHelper.isFileLoadedFlow().collectAsState(false)
     Column(modifier = Modifier
         .fillMaxSize()
         .background(LocalAppColors.current.content.background)) {

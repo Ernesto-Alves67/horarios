@@ -54,6 +54,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField(
+                "String",
+                "API_SECRET_KEY",
+                "\"3kE2JhoT7BKbiqo0IvMScAK4udROG+Xwle12wHe1UjM=\""
+            )
         }
 
         getByName("debug") {
@@ -64,7 +69,11 @@ android {
 
             isMinifyEnabled = false
             isShrinkResources = false
-
+            buildConfigField(
+                "String",
+                "API_SECRET_KEY",
+                "\"3kE2JhoT7BKbiqo0IvMScAK4udROG+Xwle12wHe1UjM=\""
+            )
         }
 
     }
@@ -77,6 +86,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -112,4 +122,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     // ConstraintLayout for Jetpack Compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    //    Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

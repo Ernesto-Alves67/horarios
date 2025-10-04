@@ -14,6 +14,7 @@ import com.scherzolambda.horarios.ui.navigation.MainNavigation
 import com.scherzolambda.horarios.ui.theme.ApplicationTheme
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.UfcatGreen
+import com.scherzolambda.horarios.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
             isSplashVisible.value = false
         }
 
+        AuthViewModel().initializeApp()
         setContent {
             ApplicationTheme {
                 MainNavigation()
