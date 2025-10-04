@@ -1,10 +1,9 @@
 package com.scherzolambda.horarios.data_transformation
-import android.util.Log
-import org.jsoup.Jsoup
-import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jsoup.Jsoup
+import java.io.File
 
 
 data class Disciplina(
@@ -28,21 +27,30 @@ data class DisciplinaSerializable(
     val local: String = ""
 )
 
+data class Identificacao(
+    val periodoLetivo: String = "",
+    val matricula: String = "",
+    val nome: String = "",
+    val curso: String = "",
+    val formacao: String = ""
+)
+
 class FileProcessor {
     /**
      * Extrai todas as tabelas de um arquivo HTML específico.
      * @param filePath O caminho para o arquivo HTML.
-     * @return Uma lista de listas de Disciplinas (um conjunto de disciplinas para cada tabela).
+     * @return Pair contendo os dados de identificação e uma lista de listas de Disciplinas.
      */
-    fun extrairTabelasDeHtml(filePath: String): List<List<Disciplina>> {
+    fun extrairTabelasDeHtml(filePath: String): Pair<Identificacao?, List<List<Disciplina>>> {
         val tabelasExtraidas = mutableListOf<List<Disciplina>>()
+        var identificacao: Identificacao? = null
 
         // 1. Carregar o documento HTML
         val doc = try {
-            Jsoup.parse(File(filePath), null)//ISO-8859-1
+            Jsoup.parse(File(filePath), null)
         } catch (e: Exception) {
             println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
-            return emptyList()
+            return Pair(null, emptyList())
         }
 
         // 2. Encontrar todas as tags <table>
@@ -50,28 +58,24 @@ class FileProcessor {
 
         if (tables.isEmpty()) {
             println("Nenhuma tabela encontrada no documento HTML.")
-            return emptyList()
+            return Pair(null, emptyList())
         }
-
 
         tables.forEachIndexed { tableIndex, table ->
             val disciplinasDaTabela = mutableListOf<Disciplina>()
             val rows = table.select("tbody tr")
-//            println("Processando Tabela ${tableIndex + 1} com ${rows} linhas.\n")
-            rows.forEach { row ->
-
-                val cells = row.select("td")
-//                Log.d("FileProcessor", "Tabela ${tableIndex + 1}, Linha: ${row.text()}, Células: ${cells.size}")
-                if ( !(tableIndex == 0 || tableIndex == 2)) {
+            if (!(tableIndex == 0 || tableIndex == 2)) {
+                // ...processamento das disciplinas...
+                rows.forEach { row ->
+                    val cells = row.select("td")
                     try {
                         val componenteCurricular = cells[1].select("span.componente").text()
-                        // Remove prefixo "Local:" (caso-insensitivo) e espaços extras, mantendo só o valor do local
                         val localRaw = cells[1].select("span.local").text()
                         val local = localRaw.replaceFirst(Regex("(?i)\\s*Local\\s*:\\s*"), "").trim()
                         val docente = cells[1].select("span.docente").text()
                         val horarioBruto = cells[4].text()
                         val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
-                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
+//                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
                         val disciplina = Disciplina(
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
@@ -83,14 +87,39 @@ class FileProcessor {
                         )
                         disciplinasDaTabela.add(disciplina)
                     } catch (e: Exception) {
-                        println("Erro ao processar linha da Tabela ${tableIndex + 1}: ${e.message}")
+//                        println("Erro ao processar linha da Tabela ${tableIndex + 1}: ${e.message}")
                     }
+                }
+            } else {
+                // Processa tabela de identificação
+                if (table.id() == "identificacao") {
+                    val map = mutableMapOf<String, String>()
+                    rows.forEach { row ->
+                        val cells = row.select("td")
+                        if (cells.size >= 2) {
+                            val key = cells[0].text().replace(":", "").trim()
+                            val value = cells[1].select("strong").text().ifEmpty { cells[1].text() }.trim()
+                            map[key] = value
+                        }
+                        if (cells.size >= 4) {
+                            val key2 = cells[2].text().replace(":", "").trim()
+                            val value2 = cells[3].select("strong").text().ifEmpty { cells[3].text() }.trim()
+                            map[key2] = value2
+                        }
+                    }
+                    identificacao = Identificacao(
+                        periodoLetivo = map["Período Letivo"] ?: "",
+                        matricula = map["Matrícula"] ?: "",
+                        nome = map["Nome"] ?: "",
+                        curso = map["Curso"] ?: "",
+                        formacao = map["Formação"] ?: ""
+                    )
                 }
             }
             tabelasExtraidas.add(disciplinasDaTabela)
         }
 
-        return tabelasExtraidas
+        return Pair(identificacao, tabelasExtraidas)
     }
 }
 

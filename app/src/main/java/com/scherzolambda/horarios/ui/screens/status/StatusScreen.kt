@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,11 +35,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
-import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
+import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -79,7 +77,7 @@ fun StatusScreen(
             disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
             salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
             Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
-            DataStoreHelper.setFileLoaded(context, true)
+            htmlUri = null // Reset para permitir seleção do mesmo arquivo
         }
     }
 
@@ -103,7 +101,6 @@ fun StatusScreen(
                 CircularProgressIndicator()
             }
         } else if (disciplinas.isNotEmpty()) {
-            Log.d("StatusScreen", "Exibindo ${disciplinas.size} disciplinas")
             StatusInfoCard(
                 title = "Arquivo carregado",
                 info = "",
@@ -157,8 +154,6 @@ fun StatusScreen(
 
         }
         else {
-            Log.d("StatusScreen", "Nenhuma disciplina para exibir")
-
             StatusInfoCard(
                 title = "Nenhum arquivo carregado",
                 info = "Por favor, selecione um arquivo HTML.",

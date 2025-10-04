@@ -1,34 +1,53 @@
 package com.scherzolambda.horarios.data_transformation
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-val Context.dataStore by preferencesDataStore(name = "app_preferences")
-
 object DataStoreHelper {
-//    private val FIRST_ACCESS_KEY = booleanPreferencesKey("is_first_access")
+    private lateinit var dataStore: DataStore<Preferences>
+
     private val FILE_LOADED_KEY = booleanPreferencesKey("is_file_loaded")
+    private val FISRT_ACCESS_KEY = booleanPreferencesKey("if_first_access")
+    private val ACCESS_TOKEN_KEY = stringPreferencesKey("acess_token")
 
-//    fun isFirstAccessFlow(context: Context): Flow<Boolean> =
-//        context.dataStore.data.map { it[FIRST_ACCESS_KEY] ?: true }
-//
-//    suspend fun setFirstAccess(context: Context, value: Boolean) {
-//        context.dataStore.edit { prefs ->
-//            prefs[FIRST_ACCESS_KEY] = value
-//        }
-//    }
+    // Função para inicializar o DataStore
+    fun initialize(dataStore: DataStore<Preferences>) {
+        this.dataStore = dataStore
+    }
 
-    fun isFileLoadedFlow(context: Context): Flow<Boolean> =
-        context.dataStore.data.map { it[FILE_LOADED_KEY] ?: false }
+    fun isFileLoadedFlow(): Flow<Boolean> =
+        dataStore.data.map { it[FILE_LOADED_KEY] ?: false }
 
-    suspend fun setFileLoaded(context: Context, value: Boolean) {
-        context.dataStore.edit { prefs ->
+    suspend fun setFileLoaded(value: Boolean) {
+        dataStore.edit { prefs ->
             prefs[FILE_LOADED_KEY] = value
         }
+    }
+
+    fun getAccessTokenFlow(): Flow<String?> =
+        dataStore.data.map { it[ACCESS_TOKEN_KEY] }
+
+    suspend fun setAccessToken(value: String) {
+        dataStore.edit { prefs ->
+            prefs[ACCESS_TOKEN_KEY] = value
+        }
+    }
+    fun isFirstAccessFlow(): Flow<Boolean> =
+        dataStore.data.map { it[FISRT_ACCESS_KEY] ?: true }
+
+    /** Define se é o primeiro acesso do usuário
+     *  Quando True, registra dados. Quando False, atualiza.
+     * */
+    suspend fun setFirstAccess(value: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[FISRT_ACCESS_KEY] = value}
     }
 }
 

@@ -1,6 +1,5 @@
 package com.scherzolambda.horarios.ui.screens.week
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +22,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,10 +37,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
-import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
@@ -50,7 +48,6 @@ import com.scherzolambda.horarios.ui.theme.M_PeriodColor
 import com.scherzolambda.horarios.ui.theme.N_PeriodColor
 import com.scherzolambda.horarios.ui.theme.T_PeriodColor
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
-import com.scherzolambda.horarios.ui.theme.UfcatGray
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 
@@ -77,7 +74,7 @@ fun WeeklyScreen(
                 CircularProgressIndicator()
             }
         } else {
-            WeeklySchedule(horarios,context)
+            WeeklySchedule(horarios)
         }
     }
 }
@@ -85,8 +82,8 @@ fun WeeklyScreen(
 
 @Composable
 fun WeeklySchedule(
-    horarios: List<HorarioSemanal>,
-    context: Context) {
+    horarios: List<HorarioSemanal>
+) {
     val diasUteis = DaysOfWeekMap.days.filterKeys { it in 2..6 }
     val periodos = listOf(HourType.M, HourType.T)
     val horariosPorPeriodo = mapOf(
@@ -99,10 +96,12 @@ fun WeeklySchedule(
     }
 
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
-    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(false)
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(LocalAppColors.current.content.background)) {
+    val isFileLoaded by DataStoreHelper.isFileLoadedFlow().collectAsState(false)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalAppColors.current.content.background)
+    ) {
         // Cabeçalho fixo
         DaysOfWeekHeader(diasUteis.values.toList())
 
@@ -124,7 +123,7 @@ fun WeeklySchedule(
             list
         }
 
-       when (isFileLoaded) {
+        when (isFileLoaded) {
             true -> LazyVerticalGrid(
                 columns = GridCells.Fixed(diasUteis.size),
                 modifier = Modifier
@@ -136,7 +135,7 @@ fun WeeklySchedule(
             ) {
                 items(gridItems.size, key = { index -> index }) { index ->
                     val (text, color, celula) = gridItems[index]
-                    if(text.equals("-----")){
+                    if (text.equals("-----")) {
                         // Célula vazia, não renderiza nada
                     } else {
                         Box(
@@ -164,6 +163,7 @@ fun WeeklySchedule(
                     }
                 }
             }
+
             false -> MessageInfoCard(
                 title = "Nenhum horário disponível",
                 info = "Parece que não há disciplinas cadastradas no momento.",
@@ -172,7 +172,7 @@ fun WeeklySchedule(
                     .padding(16.dp)
             )
         }
-
+        //info dialog
         selectedCell?.let { cell ->
             AlertDialog(
                 onDismissRequest = { selectedCell = null },
@@ -200,8 +200,14 @@ fun WeeklySchedule(
                         if (cell.local.isNotBlank()) {
                             DialogInfoRow(label = "Local:", value = cell.local)
                         }
-                        DialogInfoRow(label = "Horário:", value = HourMaps.getHourRange(cell.periodo, cell.horario))
-                        DialogInfoRow(label = "Período:", value = HourMaps.getHourName(cell.periodo))
+                        DialogInfoRow(
+                            label = "Horário:",
+                            value = HourMaps.getHourRange(cell.periodo, cell.horario)
+                        )
+                        DialogInfoRow(
+                            label = "Período:",
+                            value = HourMaps.getHourName(cell.periodo)
+                        )
                         DialogInfoRow(label = "Docente:", value = cell.docente)
                     }
                 }
@@ -244,8 +250,10 @@ fun MessageInfoCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .background(LocalAppColors.current.content.whiteText,
-                shape = RoundedCornerShape(8.dp))
+            .background(
+                LocalAppColors.current.content.whiteText,
+                shape = RoundedCornerShape(8.dp)
+            )
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {

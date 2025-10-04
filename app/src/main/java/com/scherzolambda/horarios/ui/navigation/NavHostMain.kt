@@ -1,8 +1,6 @@
 package com.scherzolambda.horarios.ui.navigation
 
 import android.webkit.WebView
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -47,13 +45,13 @@ import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
-import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
-import com.scherzolambda.horarios.ui.theme.AppTypography
+import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
-import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
+import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
+import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -75,6 +73,7 @@ val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
 fun MainNavigation() {
     val navController = rememberNavController()
     val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
+    val updateViewModel: UpdateViewModel = hiltViewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Daily.route
     val context = LocalContext.current
@@ -124,6 +123,7 @@ fun MainNavigation() {
             navController = navController,
             innerPadding = innerPadding,
             disciplinaViewModel = disciplinaViewModel,
+            updateViewModel = updateViewModel,
             sigaaWebViewRef = { sigaaWebView = it },
         )
     }
@@ -220,6 +220,7 @@ fun AppNavHost(
     navController: NavHostController,
     innerPadding: PaddingValues,
     disciplinaViewModel: DisciplinaViewModel,
+    updateViewModel: UpdateViewModel,
     sigaaWebViewRef: (WebView?) -> Unit,
 ) {
     NavHost(
@@ -227,7 +228,9 @@ fun AppNavHost(
         startDestination = Screen.Daily.route,
         modifier = Modifier.padding(innerPadding)
     ) {
-        composable(Screen.Daily.route) { DailyScreen(innerPadding, disciplinaViewModel) }
+        composable(Screen.Daily.route) {
+            DailyScreen(
+                innerPadding, disciplinaViewModel, updateViewModel) }
         composable(Screen.Weekly.route) { WeeklyScreen(disciplinaViewModel) }
         composable(Screen.Status.route) { StatusScreen(disciplinaViewModel) }
         composable(Screen.Sigaa.route) {

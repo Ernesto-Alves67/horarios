@@ -31,7 +31,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0.0"
+        versionName = "1.10.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,6 +54,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField(
+                "String",
+                "API_SECRET_KEY",
+                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
+            )
         }
 
         getByName("debug") {
@@ -64,7 +69,11 @@ android {
 
             isMinifyEnabled = false
             isShrinkResources = false
-
+            buildConfigField(
+                "String",
+                "API_SECRET_KEY",
+                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
+            )
         }
 
     }
@@ -77,6 +86,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -90,8 +100,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation("com.google.accompanist:accompanist-pager:0.32.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
     // Para análise de HTML
     implementation("org.jsoup:jsoup:1.17.2")
     // Para manipulação de JSON (Kotlinx Serialization)
@@ -112,4 +120,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     // ConstraintLayout for Jetpack Compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+
+    //    Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

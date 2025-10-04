@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +38,11 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.getTodayClasses2
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
+import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
@@ -51,6 +53,7 @@ import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
+import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
@@ -60,18 +63,26 @@ import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 @Composable
 fun DailyScreen(
     paddingValues: PaddingValues,
-    disciplinaViewModel: DisciplinaViewModel
+    disciplinaViewModel: DisciplinaViewModel,
+    updateViewModel: UpdateViewModel
 ) {
+
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
-
-    // Deriva o horário semanal do estado de disciplinas
+    var latestVersion = updateViewModel.latestVersion
+    var downloadUrl = updateViewModel.downloadUrl
+    var showDialog by remember { mutableStateOf(false) }
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
     val disciplinasHoje = remember(horariosSemanalState) {
         getTodayClasses2(horariosSemanalState)
     }
 
+    LaunchedEffect(latestVersion, downloadUrl) {
+        if (latestVersion != null && downloadUrl != null) {
+            showDialog = true
+        }
+    }
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -101,52 +112,68 @@ fun DailyScreen(
                 )
             }
         } else {
-            // Header fixo no topo
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                UfcatRed,
-                                Color(0xFFFF3366), // tom rosa-avermelhado
-                                Color(0xFFFF6600),  // tom laranja
-                                UfcatOrangeDark
-                            )
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+
+            when(disciplinasHoje.isEmpty()){
+                true -> {
+                    InfoCollumn(
+                        title = "Nenhuma aula hoje",
+                        info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     )
-                    .padding(vertical = 8.dp, horizontal = 8.dp)
-            ) {
-                Text(
-                    text = "Aulas de Hoje",
-                    fontSize = 32.sp,
-                    fontWeight = Bold,
-                    color = LocalAppColors.current.content.blackText,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                }
+                false -> {
+                    // Header fixo no topo
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        UfcatRed,
+                                        Color(0xFFFF3366), // tom rosa-avermelhado
+                                        Color(0xFFFF6600),  // tom laranja
+                                        UfcatOrangeDark
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(vertical = 8.dp, horizontal = 8.dp)
+                    ) {
+                        Text(
+                            text = "Aulas de Hoje",
+                            fontSize = 32.sp,
+                            fontWeight = Bold,
+                            color = LocalAppColors.current.content.blackText,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .padding(4.dp),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
+                            HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
+                            HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
+                            HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                }
+
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(4.dp),
-                verticalArrangement = Arrangement.Top
-            ) {
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
-                    HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
-                    HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
-                    HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-            }
         }
 
         // Dialog (fora da área rolável) para ficar acima do conteúdo quando aberto
@@ -184,6 +211,18 @@ fun DailyScreen(
                         DialogInfoRow("Docente", selectedCell!!.docente)
                     }
                 }
+            )
+        }
+
+        // Update dialog
+        if (showDialog && latestVersion != null && downloadUrl != null) {
+            UpdateDialog(
+                latestVersion = latestVersion,
+                downloadUrl = downloadUrl,
+                onDismiss = {
+                    downloadUrl = null
+                    latestVersion = null
+                    showDialog = false }
             )
         }
     }
@@ -267,6 +306,33 @@ fun HoursOfDayComponent(
 
             }
         }
+    }
+}
+
+@Composable
+fun InfoCollumn(
+    title: String,
+    info: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = Bold,
+            color = LocalAppColors.current.content.blackText
+        )
+        Text(
+            text = info,
+            fontSize = 16.sp,
+            color = LocalAppColors.current.content.blackText
+        )
     }
 }
 
