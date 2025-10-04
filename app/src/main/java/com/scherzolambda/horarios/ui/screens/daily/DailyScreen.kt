@@ -1,5 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,10 +39,12 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.getTodayClasses2
+import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
@@ -51,6 +55,7 @@ import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
+import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
@@ -60,18 +65,34 @@ import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 @Composable
 fun DailyScreen(
     paddingValues: PaddingValues,
-    disciplinaViewModel: DisciplinaViewModel
+    disciplinaViewModel: DisciplinaViewModel,
+    updateViewModel: UpdateViewModel = hiltViewModel()
 ) {
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
+    val latestVersion = updateViewModel.latestVersion
+    val downloadUrl = updateViewModel.downloadUrl
 
+    // controla a visibilidade do diálogo
+    var showDialog by remember { mutableStateOf(false) }
     // Deriva o horário semanal do estado de disciplinas
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
     val disciplinasHoje = remember(horariosSemanalState) {
         getTodayClasses2(horariosSemanalState)
     }
+//    LaunchedEffect(Unit) {
+//        updateViewModel.checkForUpdate()
+//    }
 
+    Log.d("DailyScreen", "DL: $downloadUrl")
+    Log.d("DailyScreen", "last: $latestVersion")
+    // se achou versão nova → mostra o diálogo
+    LaunchedEffect(latestVersion, downloadUrl) {
+        if (latestVersion != null && downloadUrl != null) {
+            showDialog = true
+        }
+    }
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -184,6 +205,15 @@ fun DailyScreen(
                         DialogInfoRow("Docente", selectedCell!!.docente)
                     }
                 }
+            )
+        }
+
+        // Update dialog
+        if (showDialog && latestVersion != null && downloadUrl != null) {
+            UpdateDialog(
+                latestVersion = latestVersion,
+                downloadUrl = downloadUrl,
+                onDismiss = { showDialog = false }
             )
         }
     }

@@ -12,4 +12,6 @@ class AuthRepository {
     fun saveUserData(body: RegisterBody) = authService.registerUser(body)
 
     suspend fun updateUserData(body: RegisterBody) = authService.updateUser(body)
+
+    suspend fun downloadApk(apkUrl: String) = authService.downloadApk(apkUrl)
 }
