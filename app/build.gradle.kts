@@ -100,8 +100,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation("com.google.accompanist:accompanist-pager:0.32.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
     // Para análise de HTML
     implementation("org.jsoup:jsoup:1.17.2")
     // Para manipulação de JSON (Kotlinx Serialization)

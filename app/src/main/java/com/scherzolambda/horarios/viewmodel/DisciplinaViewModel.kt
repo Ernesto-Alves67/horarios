@@ -10,7 +10,7 @@ import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext
 import android.content.Context
 import android.util.Log
-import com.scherzoVoid.reverseSocial.api.models.responses.AuthResponse
+import com.scherzolambda.horarios.data_transformation.api.models.responses.AuthResponse
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.Identificacao
 import com.scherzolambda.horarios.data_transformation.api.models.bodies.RegisterBody
@@ -41,7 +41,6 @@ class DisciplinaViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    // Cache do horário semanal para evitar recálculos
     val weeklySchedule: StateFlow<List<HorarioSemanal>> = _disciplinas
         .map { disciplinas -> montarHorariosSemanaisDeDisciplinas(disciplinas) }
         .stateIn(
@@ -75,7 +74,7 @@ class DisciplinaViewModel @Inject constructor(
     }
 
     fun carregarDeArquivoHtml(filePath: String) {
-        Log.d("DisciplinaViewModel", "Carregando disciplinas do arquivo: $filePath")
+//        Log.d("DisciplinaViewModel", "Carregando disciplinas do arquivo: $filePath")
         val isFistAccess = DataStoreHelper.isFirstAccessFlow().map { it }.stateIn(
             viewModelScope,
             SharingStarted.Lazily,
@@ -83,7 +82,7 @@ class DisciplinaViewModel @Inject constructor(
         )
         viewModelScope.launch {
             _isLoading.value = true
-            _disciplinas.value = emptyList() // Limpa a lista antes de carregar novas disciplinas
+            _disciplinas.value = emptyList()
             var userData: Pair<Identificacao?, List<List<Disciplina>>>
             withContext(Dispatchers.IO){
                 userData = fileProcessor.extrairTabelasDeHtml(filePath)
@@ -92,7 +91,7 @@ class DisciplinaViewModel @Inject constructor(
             val identificacao = userData.first
 
             val isFirstAccess = DataStoreHelper.isFirstAccessFlow().first()
-            Log.d("DisciplinaViewModel", "Identificação extraída: $isFirstAccess")
+//            Log.d("DisciplinaViewModel", "Identificação extraída: $isFirstAccess")
             when (isFirstAccess) {
                 true -> {
                     saveUserData(identificacao)

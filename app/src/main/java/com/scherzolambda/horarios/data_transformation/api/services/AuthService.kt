@@ -1,7 +1,7 @@
 package com.scherzoVoid.reverseSocial.api.services
 
 
-import com.scherzoVoid.reverseSocial.api.models.responses.AuthResponse
+import com.scherzolambda.horarios.data_transformation.api.models.responses.AuthResponse
 import com.scherzolambda.horarios.data_transformation.api.models.bodies.RegisterBody
 import okhttp3.ResponseBody
 import retrofit2.Call

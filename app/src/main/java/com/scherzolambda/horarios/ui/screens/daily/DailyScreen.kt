@@ -1,6 +1,5 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,11 +38,10 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.getTodayClasses2
+import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
@@ -66,28 +64,20 @@ import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 fun DailyScreen(
     paddingValues: PaddingValues,
     disciplinaViewModel: DisciplinaViewModel,
-    updateViewModel: UpdateViewModel = hiltViewModel()
+    updateViewModel: UpdateViewModel
 ) {
+
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
-    val latestVersion = updateViewModel.latestVersion
-    val downloadUrl = updateViewModel.downloadUrl
-
-    // controla a visibilidade do diálogo
+    var latestVersion = updateViewModel.latestVersion
+    var downloadUrl = updateViewModel.downloadUrl
     var showDialog by remember { mutableStateOf(false) }
-    // Deriva o horário semanal do estado de disciplinas
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
     val disciplinasHoje = remember(horariosSemanalState) {
         getTodayClasses2(horariosSemanalState)
     }
-//    LaunchedEffect(Unit) {
-//        updateViewModel.checkForUpdate()
-//    }
 
-    Log.d("DailyScreen", "DL: $downloadUrl")
-    Log.d("DailyScreen", "last: $latestVersion")
-    // se achou versão nova → mostra o diálogo
     LaunchedEffect(latestVersion, downloadUrl) {
         if (latestVersion != null && downloadUrl != null) {
             showDialog = true
@@ -122,52 +112,68 @@ fun DailyScreen(
                 )
             }
         } else {
-            // Header fixo no topo
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                UfcatRed,
-                                Color(0xFFFF3366), // tom rosa-avermelhado
-                                Color(0xFFFF6600),  // tom laranja
-                                UfcatOrangeDark
-                            )
-                        ),
-                        shape = RoundedCornerShape(12.dp)
+
+            when(disciplinasHoje.isEmpty()){
+                true -> {
+                    InfoCollumn(
+                        title = "Nenhuma aula hoje",
+                        info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
                     )
-                    .padding(vertical = 8.dp, horizontal = 8.dp)
-            ) {
-                Text(
-                    text = "Aulas de Hoje",
-                    fontSize = 32.sp,
-                    fontWeight = Bold,
-                    color = LocalAppColors.current.content.blackText,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                }
+                false -> {
+                    // Header fixo no topo
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(
+                                        UfcatRed,
+                                        Color(0xFFFF3366), // tom rosa-avermelhado
+                                        Color(0xFFFF6600),  // tom laranja
+                                        UfcatOrangeDark
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .padding(vertical = 8.dp, horizontal = 8.dp)
+                    ) {
+                        Text(
+                            text = "Aulas de Hoje",
+                            fontSize = 32.sp,
+                            fontWeight = Bold,
+                            color = LocalAppColors.current.content.blackText,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState())
+                            .padding(4.dp),
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
+                            HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
+                            HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
+                            HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                        }
+
+                        Spacer(modifier = Modifier.padding(8.dp))
+                    }
+                }
+
             }
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(4.dp),
-                verticalArrangement = Arrangement.Top
-            ) {
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
-                    HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
-                    HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
-                    HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
-                }
-
-                Spacer(modifier = Modifier.padding(8.dp))
-            }
         }
 
         // Dialog (fora da área rolável) para ficar acima do conteúdo quando aberto
@@ -213,7 +219,10 @@ fun DailyScreen(
             UpdateDialog(
                 latestVersion = latestVersion,
                 downloadUrl = downloadUrl,
-                onDismiss = { showDialog = false }
+                onDismiss = {
+                    downloadUrl = null
+                    latestVersion = null
+                    showDialog = false }
             )
         }
     }
@@ -297,6 +306,33 @@ fun HoursOfDayComponent(
 
             }
         }
+    }
+}
+
+@Composable
+fun InfoCollumn(
+    title: String,
+    info: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = Bold,
+            color = LocalAppColors.current.content.blackText
+        )
+        Text(
+            text = info,
+            fontSize = 16.sp,
+            color = LocalAppColors.current.content.blackText
+        )
     }
 }
 

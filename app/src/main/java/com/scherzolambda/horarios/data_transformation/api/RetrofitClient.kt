@@ -1,7 +1,6 @@
 package com.scherzolambda.horarios.data_transformation.api
 
 
-import android.util.Log
 import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.Constants
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
@@ -23,8 +22,6 @@ class RetrofitClient private constructor() {
         private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
         init {
-            Log.i("RetrofitClientHORARIO", "Initial accessToken: $accessToken")
-            // Observa mudanças no accessToken e atualiza o cache
             coroutineScope.launch {
                 DataStoreHelper.getAccessTokenFlow().collect { token ->
                     accessToken = token
@@ -59,7 +56,7 @@ class RetrofitClient private constructor() {
             return retrofit
         }
 
-        // Método para obter o token de forma síncrona, se necessário
+
         fun getAccessTokenSync(): String? = runBlocking {
             DataStoreHelper.getAccessTokenFlow().firstOrNull()
         }

@@ -1,10 +1,9 @@
 package com.scherzolambda.horarios.data_transformation
-import android.util.Log
-import org.jsoup.Jsoup
-import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jsoup.Jsoup
+import java.io.File
 
 
 data class Disciplina(
@@ -76,7 +75,7 @@ class FileProcessor {
                         val docente = cells[1].select("span.docente").text()
                         val horarioBruto = cells[4].text()
                         val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
-                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
+//                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
                         val disciplina = Disciplina(
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
@@ -88,7 +87,7 @@ class FileProcessor {
                         )
                         disciplinasDaTabela.add(disciplina)
                     } catch (e: Exception) {
-                        println("Erro ao processar linha da Tabela ${tableIndex + 1}: ${e.message}")
+//                        println("Erro ao processar linha da Tabela ${tableIndex + 1}: ${e.message}")
                     }
                 }
             } else {
@@ -119,7 +118,7 @@ class FileProcessor {
             }
             tabelasExtraidas.add(disciplinasDaTabela)
         }
-        Log.d("DisciplinaViewModel", "Disciplinas extraídas: ${identificacao}" )
+
         return Pair(identificacao, tabelasExtraidas)
     }
 }

@@ -101,7 +101,6 @@ fun StatusScreen(
                 CircularProgressIndicator()
             }
         } else if (disciplinas.isNotEmpty()) {
-            Log.d("StatusScreen", "Exibindo ${disciplinas.size} disciplinas")
             StatusInfoCard(
                 title = "Arquivo carregado",
                 info = "",
@@ -155,8 +154,6 @@ fun StatusScreen(
 
         }
         else {
-            Log.d("StatusScreen", "Nenhuma disciplina para exibir")
-
             StatusInfoCard(
                 title = "Nenhum arquivo carregado",
                 info = "Por favor, selecione um arquivo HTML.",
