@@ -57,6 +57,7 @@ jobs:
           STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          API_SECRET_KEY: ${{ secrets.API_SECRET_KEY }}
 
       # 📤 Upload do APK como artefato da action
       - name: Upload build artifacts to workflow (for debugging)
