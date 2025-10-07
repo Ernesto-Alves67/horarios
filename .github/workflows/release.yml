@@ -3,7 +3,7 @@ name: Build and publish release
 on:
   push:
     branches:
-      - "main"
+      - "test/build"
     tags:
       - 'v*'
   workflow_dispatch:
@@ -72,8 +72,8 @@ jobs:
       - name: Create GitHub Release and upload artifacts
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1.10.0
-          name: Horarios v1.10.0
+          tag_name: v1.0.1
+          name: Horarios v1.0.1
           files: |
             app/build/outputs/apk/release/*.apk
           #            app/build/outputs/bundle/release/*.aab

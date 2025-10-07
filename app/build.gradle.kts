@@ -31,7 +31,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.10.0"
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,7 +57,7 @@ android {
             buildConfigField(
                 "String",
                 "API_SECRET_KEY",
-                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
+                "some_key"
             )
         }
 
