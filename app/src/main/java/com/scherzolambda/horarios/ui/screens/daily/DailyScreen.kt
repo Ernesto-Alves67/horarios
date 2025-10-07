@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.getTodayClasses2
@@ -52,6 +53,7 @@ import com.scherzolambda.horarios.ui.theme.T_PeriodColor
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
+import com.scherzolambda.horarios.ui.utils.compareVersionsSimple
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 
@@ -79,8 +81,14 @@ fun DailyScreen(
     }
 
     LaunchedEffect(latestVersion, downloadUrl) {
-        if (latestVersion != null && downloadUrl != null) {
-            showDialog = true
+        if( latestVersion != null) {
+            val currentVersion = BuildConfig.VERSION_NAME
+            val isNewer = currentVersion.compareVersionsSimple(latestVersion!!)
+            if (
+                downloadUrl != null && isNewer == -1
+            ) {
+                showDialog = true
+            }
         }
     }
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }

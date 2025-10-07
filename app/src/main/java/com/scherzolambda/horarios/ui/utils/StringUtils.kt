@@ -21,3 +21,31 @@ fun gerarAcronimo(texto: String): String {
         .map { it.first().uppercaseChar() } // Pega a 1ª letra e transforma em maiúscula
         .joinToString("") // Junta as letras
 }
+
+/**
+ * Compara esta string de versão com outra string de versão,
+ * tratando cada segmento numericamente.
+ */
+fun String.compareVersionsSimple(other: String): Int {
+    // Quebra as versões em listas de strings
+    val thisSegments = this.split('.')
+    val otherSegments = other.split('.')
+
+    // Determina o máximo de segmentos para iterar
+    val maxLen = maxOf(thisSegments.size, otherSegments.size)
+
+    for (i in 0 until maxLen) {
+        // Pega o valor do segmento, usando '0' se não houver segmento (versão mais curta)
+        val thisValue = thisSegments.getOrElse(i) { "0" }.toIntOrNull() ?: 0
+        val otherValue = otherSegments.getOrElse(i) { "0" }.toIntOrNull() ?: 0
+
+        // Compara os valores numéricos
+        if (thisValue != otherValue) {
+            // Se forem diferentes, retorna a diferença para determinar se é maior ou menor
+            return thisValue.compareTo(otherValue)
+        }
+    }
+
+    // Se todos os segmentos forem iguais, as versões são iguais
+    return 0
+}
