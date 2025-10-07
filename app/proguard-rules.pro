@@ -26,15 +26,15 @@
 # Manter a informação da linha e do arquivo fonte para facilitar o debug de crashes
 -keepattributes SourceFile,LineNumberTable
 # Manter o atributo de assinatura genérica. VITAL para desserialização (List<T>, etc.)
--keepattributes Signature
-# Manter todas as anotações, cruciais para Hilt, Dagger, Retrofit e Serialização
--keepattributes *Annotation*
+#-keepattributes Signature
+## Manter todas as anotações, cruciais para Hilt, Dagger, Retrofit e Serialização
+#-keepattributes *Annotation*
 # Não remover classes internas e anônimas (incluindo Lambdas de Coroutines/UI/Callbacks)
 -keepnames class **$* { *; }
 
 
 # ====================================================================
-# PROTEÇÃO DO SEU CÓDIGO (Pacote principal: com.scherzolambda.horarios)
+# PROTEÇÃO DO (Pacote principal: com.scherzolambda.horarios)
 # ====================================================================
 
 # 1. Manter a classe Application, ViewModels, Activities e Fragments
