@@ -3,7 +3,7 @@ name: Build and publish release
 on:
   push:
     branches:
-      - "test/build"
+      - "test/buid"
     tags:
       - 'v*'
   workflow_dispatch:
