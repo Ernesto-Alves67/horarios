@@ -2,7 +2,6 @@ package com.scherzolambda.horarios.data_transformation.api
 
 
 //import com.scherzolambda.horarios.BuildConfig
-import com.scherzolambda.horarios.Constants
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.EnvConfig
 import kotlinx.coroutines.CoroutineScope
