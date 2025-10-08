@@ -54,11 +54,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField(
-                "String",
-                "API_SECRET_KEY",
-                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
-            )
+//            buildConfigField(
+//                "String",
+//                "API_SECRET_KEY",
+//                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
+//            )
         }
 
         getByName("debug") {
@@ -69,11 +69,11 @@ android {
 
             isMinifyEnabled = false
             isShrinkResources = false
-            buildConfigField(
-                "String",
-                "API_SECRET_KEY",
-                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
-            )
+//            buildConfigField(
+//                "String",
+//                "API_SECRET_KEY",
+//                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
+//            )
         }
 
     }

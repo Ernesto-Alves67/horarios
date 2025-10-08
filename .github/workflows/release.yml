@@ -49,6 +49,12 @@ jobs:
       - name: Decode keystore from secrets
         run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > app/horarios-release-key.jks
 
+      - name: Generate env.properties
+        run: |
+          mkdir -p app/src/main/assets
+          echo "API_SECRET_KEY=${{ secrets.API_SECRET_KEY }}" > app/src/main/assets/env.properties
+          echo "BASE_URL=${{ secrets.API_SECRET_KEY }}" >> app/src/main/assets/env.properties
+
       # 🏗️ Build do release já assinado
       - name: Build signed release APK
         run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
