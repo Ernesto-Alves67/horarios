@@ -47,7 +47,10 @@
 # 2. Manter Repositórios/Classes Injetáveis (Se houver ClassCastException aqui)
 # Esta regra é genérica para cobrir qualquer classe no seu app que use injeção/reflexão.
 #-keep class com.scherzolambda.horarios.** { *; }
-
+-keep class com.scherzolambda.horarios.data_transformation.EnvConfig { *; }
+-keepclassmembers class com.scherzolambda.horarios.data_transformation.EnvConfig {
+    public static final com.scherzolambda.horarios.data_transformation.EnvConfig INSTANCE;
+}
 # 3. Manter as Classes de Modelo de Dados (DTOs)
 # Garante que todos os campos, construtores e métodos sejam mantidos para a serialização.
 -keep class com.scherzolambda.horarios.data_transformation.models.** {
