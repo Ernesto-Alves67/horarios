@@ -53,7 +53,7 @@ jobs:
         run: |
           mkdir -p app/src/main/assets
           echo "API_SECRET_KEY=${{ secrets.API_SECRET_KEY }}" > app/src/main/assets/env.properties
-          echo "BASE_URL=${{ secrets.API_SECRET_KEY }}" >> app/src/main/assets/env.properties
+          echo "BASE_URL=${{ secrets.BASE_URL }}" >> app/src/main/assets/env.properties
 
       # 🏗️ Build do release já assinado
       - name: Build signed release APK
