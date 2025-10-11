@@ -18,6 +18,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             val result = repository.initializeSession()
             if (result.isSuccessful) {
+                //TODO : dados do dispositivo
                 result.body()?.let {
                     setAccessToken(it.accessToken)
                 }

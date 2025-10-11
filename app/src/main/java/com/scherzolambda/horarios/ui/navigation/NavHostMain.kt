@@ -9,6 +9,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -43,11 +44,14 @@ import androidx.navigation.compose.rememberNavController
 import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
+import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
+import com.scherzolambda.horarios.ui.screens.config.ConfigViewModel
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
+import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatGreen
 import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
@@ -63,6 +67,7 @@ sealed class Screen(val route: String, val label: String, val iconRes: Int) {
     object Weekly : Screen("weekly", "Semana", R.drawable.ic_calendar)
     object Status : Screen("status", "Status", R.drawable.ic_info)
     object Sigaa : Screen("sigaa", "SIGAA", R.drawable.ic_internet)
+    object Config : Screen("config", "", R.drawable.ic_settings)
 }
 
 val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
@@ -74,6 +79,8 @@ fun MainNavigation() {
     val navController = rememberNavController()
     val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
     val updateViewModel: UpdateViewModel = hiltViewModel()
+    val themeViewModel: ThemeViewModel = hiltViewModel()
+    val configViewModel: ConfigViewModel = hiltViewModel()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: Screen.Daily.route
     val context = LocalContext.current
@@ -108,12 +115,27 @@ fun MainNavigation() {
         }
     } else null
 
+    if (currentRoute == Screen.Config.route) {
+        // Tela de Configurações
+
+        Scaffold { innerPadding ->
+
+            ConfigScreen(
+                onBack = { navController.popBackStack() },
+                innerPadding = innerPadding,
+                themeViewModel = themeViewModel,
+                configViewModel = configViewModel
+            )
+        }
+        return
+    }
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopBar(
                 showDownloadButton = currentRoute == Screen.Sigaa.route,
-                onDownloadClick = onDownloadClick
+                onDownloadClick = onDownloadClick,
+                onConfigClick= {navController.navigate(Screen.Config.route)}
             )
         },
         containerColor = LocalAppColors.current.content.grayElements,
@@ -124,6 +146,8 @@ fun MainNavigation() {
             innerPadding = innerPadding,
             disciplinaViewModel = disciplinaViewModel,
             updateViewModel = updateViewModel,
+            themeViewModel = themeViewModel,
+            configViewModel = configViewModel,
             sigaaWebViewRef = { sigaaWebView = it },
         )
     }
@@ -133,7 +157,8 @@ fun MainNavigation() {
 @Composable
 fun TopBar(
     showDownloadButton: Boolean = false,
-    onDownloadClick: (() -> Unit)? = null
+    onDownloadClick: (() -> Unit)? = null,
+    onConfigClick: (() -> Unit)? = null
 ) {
     CenterAlignedTopAppBar(
         colors = androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -144,10 +169,10 @@ fun TopBar(
                 Icon(
                     painterResource(R.drawable.ic_logo_ufcat),
                     contentDescription = "icone da UFCAT",
-                    modifier = Modifier.size(80.dp),
+                    modifier = Modifier.size(60.dp),
                     tint = Color.Unspecified
                 )
-                Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold, textAlign = TextAlign.Justify)
+                Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold)
             }
         },
         actions = {
@@ -156,6 +181,12 @@ fun TopBar(
                     Icon(painterResource(
                         R.drawable.ic_download),
                         contentDescription = "Botão para Baixar HTML")
+                }
+            }
+            if (onConfigClick != null && !showDownloadButton) {
+
+                IconButton(onConfigClick) {
+                    Icon(painterResource(R.drawable.ic_settings), contentDescription = "Configurações")
                 }
             }
         }
@@ -221,6 +252,8 @@ fun AppNavHost(
     innerPadding: PaddingValues,
     disciplinaViewModel: DisciplinaViewModel,
     updateViewModel: UpdateViewModel,
+    themeViewModel: ThemeViewModel,
+    configViewModel: ConfigViewModel,
     sigaaWebViewRef: (WebView?) -> Unit,
 ) {
     NavHost(
@@ -231,11 +264,20 @@ fun AppNavHost(
         composable(Screen.Daily.route) {
             DailyScreen(
                 innerPadding, disciplinaViewModel, updateViewModel) }
-        composable(Screen.Weekly.route) { WeeklyScreen(disciplinaViewModel) }
+        composable(Screen.Weekly.route) {
+            WeeklyScreen(disciplinaViewModel,configViewModel) }
         composable(Screen.Status.route) { StatusScreen(disciplinaViewModel) }
         composable(Screen.Sigaa.route) {
             SigaaWebScreen(
                 webViewRef = sigaaWebViewRef,
+            )
+        }
+        composable(Screen.Config.route) {
+            ConfigScreen(
+                themeViewModel = themeViewModel,
+                innerPadding = innerPadding,
+                onBack = { navController.popBackStack() },
+                configViewModel = configViewModel
             )
         }
     }
