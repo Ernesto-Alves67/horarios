@@ -2,14 +2,12 @@ package com.scherzolambda.horarios.ui.navigation
 
 import android.webkit.WebView
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -24,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,9 +29,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -61,13 +61,18 @@ import kotlinx.coroutines.launch
 /**
  * Define as telas principais do aplicativo com suas rotas, rótulos e ícones.
  * Utilizado para configurar a barra de navegação inferior.
+ *
+ * @see BottomNavBar
  */
 sealed class Screen(val route: String, val label: String, val iconRes: Int) {
     object Daily : Screen("daily", "Hoje", R.drawable.ic_notebook_filled)
     object Weekly : Screen("weekly", "Semana", R.drawable.ic_calendar)
     object Status : Screen("status", "Status", R.drawable.ic_info)
     object Sigaa : Screen("sigaa", "SIGAA", R.drawable.ic_internet)
-    object Config : Screen("config", "", R.drawable.ic_settings)
+}
+
+sealed class OuterScreen(val route: String) {
+    object Config : OuterScreen("config")
 }
 
 val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
@@ -115,7 +120,7 @@ fun MainNavigation() {
         }
     } else null
 
-    if (currentRoute == Screen.Config.route) {
+    if (currentRoute == OuterScreen.Config.route) {
 
         ConfigScreen(
             onBack = { navController.popBackStack() },
@@ -131,7 +136,7 @@ fun MainNavigation() {
             TopBar(
                 showDownloadButton = currentRoute == Screen.Sigaa.route,
                 onDownloadClick = onDownloadClick,
-                onConfigClick= {navController.navigate(Screen.Config.route)}
+                onConfigClick= {navController.navigate(OuterScreen.Config.route)}
             )
         },
         containerColor = LocalAppColors.current.content.grayElements,
@@ -149,6 +154,13 @@ fun MainNavigation() {
     }
 }
 
+
+@Preview
+@Composable
+fun TopBarPreview() {
+    TopBar(showDownloadButton = false, onDownloadClick = {}, onConfigClick = {})
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(
@@ -161,17 +173,33 @@ fun TopBar(
             containerColor = LocalAppColors.current.content.background,
         ),
         title = {
-            Row(verticalAlignment = Alignment.Bottom) {
+            ConstraintLayout {
+                // Create references for the composables
+                val (icon, text) = createRefs()
+
+                // Icon
                 Icon(
-                    painterResource(R.drawable.ic_logo_ufcat),
+                    painter = painterResource(R.drawable.ic_logo_ufcat),
                     contentDescription = "icone da UFCAT",
-                    modifier = Modifier.size(60.dp),
+                    modifier = Modifier
+                        .size(65.dp)
+                        .constrainAs(icon) {
+                            top.linkTo(parent.top)
+                            bottom.linkTo(parent.bottom)
+                        },
                     tint = Color.Unspecified
                 )
+
+                // Text
                 Text(
-                    stringResource(R.string.app_name),
+                    text = stringResource(R.string.app_name),
                     fontWeight = FontWeight.Bold,
-                     )
+                    textAlign = TextAlign.Justify,
+                    modifier = Modifier.constrainAs(text) {
+                        start.linkTo(icon.end)
+                        bottom.linkTo(icon.bottom, margin = 5.dp)
+                    }
+                )
             }
         },
         actions = {
@@ -185,7 +213,12 @@ fun TopBar(
             if (onConfigClick != null && !showDownloadButton) {
 
                 IconButton(onConfigClick) {
-                    Icon(painterResource(R.drawable.ic_settings), contentDescription = "Configurações")
+                    Icon(
+                        painterResource(R.drawable.ic_settings3),
+                        contentDescription = "Configurações",
+                        tint = LocalAppColors.current.content.primary,
+                        modifier = Modifier.size(40.dp)
+                            .padding(3.dp))
                 }
             }
         }
@@ -255,6 +288,12 @@ fun AppNavHost(
     configViewModel: ConfigViewModel,
     sigaaWebViewRef: (WebView?) -> Unit,
 ) {
+    val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsStateWithLifecycle()
+    val disciplinasHoje by disciplinaViewModel.todaysSchedule.collectAsStateWithLifecycle()
+    val isLoading by disciplinaViewModel.isLoading.collectAsStateWithLifecycle()
+    val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
+    val isShowEmptyDailyCells by configViewModel.showEmptyDailyCell.collectAsStateWithLifecycle()
+    val updateInfoData = updateViewModel.updateInfo
     NavHost(
         navController = navController,
         startDestination = Screen.Daily.route,
@@ -262,16 +301,26 @@ fun AppNavHost(
     ) {
         composable(Screen.Daily.route) {
             DailyScreen(
-                innerPadding, disciplinaViewModel, updateViewModel) }
+                paddingValues = innerPadding,
+                disciplinasHoje= disciplinasHoje,
+                updateInfo = updateInfoData,
+                isLoading = isLoading,
+                isShowEmptyCells = isShowEmptyDailyCells,
+            )
+        }
         composable(Screen.Weekly.route) {
-            WeeklyScreen(disciplinaViewModel,configViewModel) }
+            WeeklyScreen(
+                horarios = horariosSemanalState,
+                isLoading = isLoading,
+                isShowEmptyCells = isShowEmptyCells)
+        }
         composable(Screen.Status.route) { StatusScreen(disciplinaViewModel) }
         composable(Screen.Sigaa.route) {
             SigaaWebScreen(
                 webViewRef = sigaaWebViewRef,
             )
         }
-        composable(Screen.Config.route) {
+        composable(OuterScreen.Config.route) {
             ConfigScreen(
                 themeViewModel = themeViewModel,
                 onBack = { navController.popBackStack() },

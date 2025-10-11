@@ -55,13 +55,14 @@ import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 @Composable
 fun WeeklyScreen(
-    disciplinaViewModel: DisciplinaViewModel,
-    configViewModel: ConfigViewModel
+    horarios: List<HorarioSemanal>,
+    isLoading: Boolean,
+    isShowEmptyCells: Boolean,
 ) {
-    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
-    val isLoading by disciplinaViewModel.isLoading.collectAsState()
-
-    val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
+//    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
+//    val isLoading by disciplinaViewModel.isLoading.collectAsState()
+//
+//    val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier

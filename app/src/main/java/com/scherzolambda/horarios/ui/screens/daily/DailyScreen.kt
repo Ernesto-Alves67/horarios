@@ -1,5 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.sp
 import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
-import com.scherzolambda.horarios.data_transformation.getTodayClasses2
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
@@ -54,8 +53,7 @@ import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.ui.utils.compareVersionsSimple
-import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
-import com.scherzolambda.horarios.viewmodel.UpdateViewModel
+import com.scherzolambda.horarios.viewmodel.AppUpdateInfo
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
@@ -65,20 +63,15 @@ import com.scherzolambda.horarios.viewmodel.UpdateViewModel
 @Composable
 fun DailyScreen(
     paddingValues: PaddingValues,
-    disciplinaViewModel: DisciplinaViewModel,
-    updateViewModel: UpdateViewModel
+    disciplinasHoje: List<HorarioSemanal>,
+    updateInfo: AppUpdateInfo,
+    isLoading: Boolean,
+    isShowEmptyCells: Boolean,
 ) {
 
-    val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
-    val disciplinas = disciplinasState.value
-    val isLoading by disciplinaViewModel.isLoading.collectAsState()
-    var latestVersion = updateViewModel.latestVersion
-    var downloadUrl = updateViewModel.downloadUrl
+    var latestVersion by remember { mutableStateOf<String?>(updateInfo.latestVersion) }
+    var downloadUrl by remember { mutableStateOf<String?>(updateInfo.downloadUrl) }
     var showDialog by remember { mutableStateOf(false) }
-    val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
-    val disciplinasHoje = remember(horariosSemanalState) {
-        getTodayClasses2(horariosSemanalState)
-    }
 
     LaunchedEffect(latestVersion, downloadUrl) {
         if( latestVersion != null) {
@@ -101,7 +94,7 @@ fun DailyScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else if (disciplinas.isEmpty()) {
+        } else if (disciplinasHoje.isEmpty()) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -167,13 +160,13 @@ fun DailyScreen(
                         verticalArrangement = Arrangement.Top
                     ) {
                         if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
-                            HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                            HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
                         }
                         if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
-                            HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                            HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
                         }
                         if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
-                            HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it })
+                            HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
                         }
 
                         Spacer(modifier = Modifier.padding(8.dp))
@@ -225,8 +218,8 @@ fun DailyScreen(
         // Update dialog
         if (showDialog && latestVersion != null && downloadUrl != null) {
             UpdateDialog(
-                latestVersion = latestVersion,
-                downloadUrl = downloadUrl,
+                latestVersion = latestVersion.toString(),
+                downloadUrl = downloadUrl.toString(),
                 onDismiss = {
                     downloadUrl = null
                     latestVersion = null
@@ -239,6 +232,7 @@ fun DailyScreen(
 @Composable
 fun HoursOfDayComponent(
     hourType: HourType,
+    isShowEmpty: Boolean,
     disciplinasHoje: List<HorarioSemanal>,
     onDisciplinaClick: (HorarioSemanal) -> Unit
 ) {
@@ -272,41 +266,73 @@ fun HoursOfDayComponent(
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             hourMap.forEach { (index, hour) ->
                 val disciplinasNoHorario = disciplinasPorHora[index].orEmpty()
+                Log.d("DailyScreen", "HourType: $hourType, HourIndex: $index, Disciplinas: $disciplinasNoHorario")
+                if(disciplinasNoHorario.isEmpty()){
+                    if (isShowEmpty){
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(color = periodoColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                                .padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
 
-
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = periodoColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
-                        .padding(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Cabeçalho do horário (índice + label)
-                    Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp,bottom = 4.dp)) {
-                        Text("$index - ",
-                            color = UfcatBlack,
-                            fontWeight = Bold,
-                            fontSize = 18.sp)
-                        Text(hour, color = UfcatBlack)
-                    }
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        disciplinasNoHorario.forEach { disciplina ->
-                            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                Text(
-                                    text = disciplina.disciplina,
-                                    fontSize = 18.sp,
+                            // Cabeçalho do horário (índice + label)
+                            Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp,bottom = 4.dp)) {
+                                Text("$index - ",
                                     color = UfcatBlack,
                                     fontWeight = Bold,
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .clickable { onDisciplinaClick(disciplina) }
-                                )
-                                Text(
-                                    text = disciplina.local,
-                                    fontSize = 14.sp,
-                                    color = UfcatBlack,
-                                    modifier = Modifier.padding(start = 8.dp)
-                                )
+                                    fontSize = 18.sp)
+                                Text(hour, color = UfcatBlack)
+                            }
+                            Text(
+                                text = "Horário vago",
+                                fontSize = 16.sp,
+                                color = UfcatBlack,
+                                fontWeight = Bold,
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                            )
+                        }
+                    }
+                    Log.d("DailyScreen", "Exibindo horário vazio para HourType: $hourType, HourIndex: $index")
+                }else{
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(color = periodoColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
+                            .padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+
+                        // Cabeçalho do horário (índice + label)
+                        Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp,bottom = 4.dp)) {
+                            Text("$index - ",
+                                color = UfcatBlack,
+                                fontWeight = Bold,
+                                fontSize = 18.sp)
+                            Text(hour, color = UfcatBlack)
+                        }
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            disciplinasNoHorario.forEach { disciplina ->
+                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Text(
+                                        text = disciplina.disciplina,
+                                        fontSize = 18.sp,
+                                        color = UfcatBlack,
+                                        fontWeight = Bold,
+                                        modifier = Modifier
+                                            .padding(start = 8.dp)
+                                            .clickable { onDisciplinaClick(disciplina) }
+                                    )
+                                    Text(
+                                        text = disciplina.local,
+                                        fontSize = 14.sp,
+                                        color = UfcatBlack,
+                                        modifier = Modifier.padding(start = 8.dp)
+                                    )
+                                }
                             }
                         }
                     }

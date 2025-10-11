@@ -38,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.scherzolambda.horarios.BuildConfig
@@ -134,6 +135,7 @@ fun SecaoTitulo(texto: String) {
     Text(
         text = texto,
         style = MaterialTheme.typography.labelLarge,
+        fontWeight = FontWeight.Bold,
         color = LocalAppColors.current.content.blackText,
         modifier = Modifier.padding(16.dp)
     )

@@ -15,6 +15,7 @@ import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.Identificacao
 import com.scherzolambda.horarios.data_transformation.api.models.bodies.RegisterBody
 import com.scherzolambda.horarios.data_transformation.api.repositories.AuthRepository
+import com.scherzolambda.horarios.data_transformation.getTodayClasses2
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.montarHorariosSemanaisDeDisciplinas
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,16 @@ class DisciplinaViewModel @Inject constructor(
 
     val weeklySchedule: StateFlow<List<HorarioSemanal>> = _disciplinas
         .map { disciplinas -> montarHorariosSemanaisDeDisciplinas(disciplinas) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val todaysSchedule: StateFlow<List<HorarioSemanal>> = weeklySchedule
+        .map { schedule ->
+            getTodayClasses2(schedule)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

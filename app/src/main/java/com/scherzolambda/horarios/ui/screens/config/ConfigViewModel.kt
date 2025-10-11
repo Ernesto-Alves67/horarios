@@ -14,14 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ConfigViewModel @Inject constructor() : ViewModel() {
-    // Estado do tema selecionado
-
     private val _showEmptyWeeklyCell = MutableStateFlow(false)
     val showEmptyWeeklyCell: StateFlow<Boolean> = _showEmptyWeeklyCell
     private val _showEmptyDailyCell = MutableStateFlow(false)
     val showEmptyDailyCell: StateFlow<Boolean> = _showEmptyDailyCell
-
-    // inicializar com os valores salvos no data store
 
     init {
         DataStoreHelper.getShowEmptyWeeklyCellFlow()
@@ -35,13 +31,13 @@ class ConfigViewModel @Inject constructor() : ViewModel() {
     fun setShowEmptyWeeklyCell(show: Boolean) {
         _showEmptyWeeklyCell.value = show
         viewModelScope.launch {
-            // Aqui você pode salvar a preferência no DataStore ou SharedPreferences
+            DataStoreHelper.setShowEmptyWeeklyCell(show)
         }
     }
     fun setShowEmptyDailyCell(show: Boolean) {
         _showEmptyDailyCell.value = show
         viewModelScope.launch {
-            // Aqui você pode salvar a preferência no DataStore ou SharedPreferences
+            DataStoreHelper.setShowEmptyDailyCell(show)
         }
     }
 

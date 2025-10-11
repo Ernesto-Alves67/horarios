@@ -23,6 +23,9 @@ class UpdateViewModel @Inject constructor(
     var downloadUrl by mutableStateOf<String?>(null)
         private set
 
+    var updateInfo by mutableStateOf(AppUpdateInfo())
+        private set
+
     init {
         checkForUpdate()
     }
@@ -35,8 +38,8 @@ class UpdateViewModel @Inject constructor(
                 Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: ${release.tagName}")
                 Log.d("UpdateCheck", "Release details: $release")
                 if (release.tagName != currentVersion) {
-                    latestVersion = release.tagName
-                    downloadUrl = release.assets?.firstOrNull()?.downloadUrl
+                    updateInfo.latestVersion = release.tagName
+                    updateInfo.downloadUrl = release.assets?.firstOrNull()?.downloadUrl.toString()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -44,3 +47,8 @@ class UpdateViewModel @Inject constructor(
         }
     }
 }
+
+data class AppUpdateInfo(
+    var latestVersion: String ="",
+    var downloadUrl: String= ""
+)
