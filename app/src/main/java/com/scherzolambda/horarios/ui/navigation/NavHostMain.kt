@@ -116,17 +116,13 @@ fun MainNavigation() {
     } else null
 
     if (currentRoute == Screen.Config.route) {
-        // Tela de Configurações
 
-        Scaffold { innerPadding ->
+        ConfigScreen(
+            onBack = { navController.popBackStack() },
+            themeViewModel = themeViewModel,
+            configViewModel = configViewModel
+        )
 
-            ConfigScreen(
-                onBack = { navController.popBackStack() },
-                innerPadding = innerPadding,
-                themeViewModel = themeViewModel,
-                configViewModel = configViewModel
-            )
-        }
         return
     }
     Scaffold(
@@ -172,7 +168,10 @@ fun TopBar(
                     modifier = Modifier.size(60.dp),
                     tint = Color.Unspecified
                 )
-                Text(stringResource(R.string.app_name), fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(R.string.app_name),
+                    fontWeight = FontWeight.Bold,
+                     )
             }
         },
         actions = {
@@ -275,7 +274,6 @@ fun AppNavHost(
         composable(Screen.Config.route) {
             ConfigScreen(
                 themeViewModel = themeViewModel,
-                innerPadding = innerPadding,
                 onBack = { navController.popBackStack() },
                 configViewModel = configViewModel
             )

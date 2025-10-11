@@ -28,49 +28,44 @@ import com.scherzolambda.horarios.ui.theme.AppTheme
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val isSplashVisible = mutableStateOf(true)
+    private val authViewModel: AuthViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val splashScreen = installSplashScreen()
-        splashScreen.setKeepOnScreenCondition { isSplashVisible.value }
-
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        // Configurar as cores das barras dinamicamente
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
-//        window.statusBarColor = android.graphics.Color.TRANSPARENT
-//        window.navigationBarColor = android.graphics.Color.TRANSPARENT
-
-        lifecycleScope.launch {
-            delay(600)
-            isSplashVisible.value = false
+        // Instala o SplashScreen e controla a visibilidade.
+        installSplashScreen().apply {
+            setKeepOnScreenCondition { authViewModel.isSplashVisible.value }
         }
 
-        AuthViewModel().initializeApp()
-        val themeViewModel: ThemeViewModel by viewModels()
+        enableEdgeToEdge()
+
+        // Configuração da interface do usuário com o tema atual
         setContent {
             val appTheme by themeViewModel.theme.collectAsState()
+
+            // Atualiza a aparência da barra de status com base no tema.
             StatusBarAppearanceUpdater(appTheme) { isDark ->
                 updateStatusBarAppearance(isDark)
             }
+
+            // Aplica o tema selecionado e renderiza a navegação principal.
             ApplicationTheme(appTheme) {
                 MainNavigation()
             }
         }
     }
+
     private fun updateStatusBarAppearance(isDark: Boolean) {
         val controller = WindowInsetsControllerCompat(window, window.decorView)
-        if (isDark) {
-            controller.isAppearanceLightStatusBars = false // ícones claros
-        } else {
-            controller.isAppearanceLightStatusBars = true // ícones escuros
-            controller.isAppearanceLightNavigationBars = false
+        controller.isAppearanceLightStatusBars = !isDark // Ícones escuros se tema for escuro
+        controller.isAppearanceLightNavigationBars = false
+
+        if (!isDark) {
             window.navigationBarColor = 0
         }
     }
-
 }
 
 @Composable
@@ -80,6 +75,8 @@ fun StatusBarAppearanceUpdater(appTheme: AppTheme, onUpdate: (Boolean) -> Unit) 
         AppTheme.LIGHT -> false
         AppTheme.SYSTEM -> isSystemInDarkTheme()
     }
+
+    // Atualiza a aparência da barra de status quando o tema mudar
     LaunchedEffect(isDark) {
         onUpdate(isDark)
     }

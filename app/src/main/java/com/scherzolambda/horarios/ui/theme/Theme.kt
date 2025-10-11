@@ -58,7 +58,9 @@ fun ApplicationTheme(
         lightColorScheme(
             primary = appColors.content.primary,
             background = appColors.content.background,
-            onPrimary = appColors.content.background
+            onPrimary = appColors.content.background,
+            surface = appColors.content.grayElements,
+            onSurface = appColors.content.blackText,
         )
     }
     CompositionLocalProvider(LocalAppColors provides appColors) {

@@ -30,7 +30,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.10.5"
+        versionName = "1.20.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -95,6 +95,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -109,7 +110,8 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     // ConstraintLayout for Jetpack Compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
-
+    // meterial icons
+    implementation("androidx.compose.material:material-icons-core")
     //    Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
