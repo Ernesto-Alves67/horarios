@@ -1,7 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
 
-//val envFile = rootProject.file(".env")
 val keystoreProperties = Properties()
 val envFile = rootProject.file("env.properties")
 if (envFile.exists()) {
@@ -31,7 +30,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.10.0"
+        versionName = "1.10.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -54,11 +53,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField(
-                "String",
-                "API_SECRET_KEY",
-                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
-            )
         }
 
         getByName("debug") {
@@ -69,11 +63,6 @@ android {
 
             isMinifyEnabled = false
             isShrinkResources = false
-            buildConfigField(
-                "String",
-                "API_SECRET_KEY",
-                "\"${getEnvOrProperty("API_SECRET_KEY") ?: ""}\""
-            )
         }
 
     }

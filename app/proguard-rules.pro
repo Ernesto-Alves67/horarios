@@ -26,15 +26,15 @@
 # Manter a informação da linha e do arquivo fonte para facilitar o debug de crashes
 -keepattributes SourceFile,LineNumberTable
 # Manter o atributo de assinatura genérica. VITAL para desserialização (List<T>, etc.)
--keepattributes Signature
-# Manter todas as anotações, cruciais para Hilt, Dagger, Retrofit e Serialização
--keepattributes *Annotation*
+#-keepattributes Signature
+## Manter todas as anotações, cruciais para Hilt, Dagger, Retrofit e Serialização
+#-keepattributes *Annotation*
 # Não remover classes internas e anônimas (incluindo Lambdas de Coroutines/UI/Callbacks)
 -keepnames class **$* { *; }
 
 
 # ====================================================================
-# PROTEÇÃO DO SEU CÓDIGO (Pacote principal: com.scherzolambda.horarios)
+# PROTEÇÃO DO (Pacote principal: com.scherzolambda.horarios)
 # ====================================================================
 
 # 1. Manter a classe Application, ViewModels, Activities e Fragments
@@ -47,7 +47,10 @@
 # 2. Manter Repositórios/Classes Injetáveis (Se houver ClassCastException aqui)
 # Esta regra é genérica para cobrir qualquer classe no seu app que use injeção/reflexão.
 #-keep class com.scherzolambda.horarios.** { *; }
-
+-keep class com.scherzolambda.horarios.data_transformation.EnvConfig { *; }
+-keepclassmembers class com.scherzolambda.horarios.data_transformation.EnvConfig {
+    public static final com.scherzolambda.horarios.data_transformation.EnvConfig INSTANCE;
+}
 # 3. Manter as Classes de Modelo de Dados (DTOs)
 # Garante que todos os campos, construtores e métodos sejam mantidos para a serialização.
 -keep class com.scherzolambda.horarios.data_transformation.models.** {

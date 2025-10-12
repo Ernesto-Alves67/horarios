@@ -1,9 +1,9 @@
 package com.scherzolambda.horarios.data_transformation.api
 
 
-import com.scherzolambda.horarios.BuildConfig
-import com.scherzolambda.horarios.Constants
+//import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
+import com.scherzolambda.horarios.data_transformation.EnvConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,7 +34,7 @@ class RetrofitClient private constructor() {
                 .addInterceptor { chain ->
                     val requestBuilder = chain.request().newBuilder()
                         .header("Content-Type", "application/json")
-                        .header("X-API-Key", BuildConfig.API_SECRET_KEY)
+                        .header("X-API-Key", EnvConfig.get("API_SECRET_KEY"))
                         .header("User-Agent", "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36")
 
                     // Adiciona o token ao header, se disponível
@@ -48,7 +48,7 @@ class RetrofitClient private constructor() {
 
             if (!::retrofit.isInitialized) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl(Constants.BASE_URL)
+                    .baseUrl(EnvConfig.get("BASE_URL"))
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
