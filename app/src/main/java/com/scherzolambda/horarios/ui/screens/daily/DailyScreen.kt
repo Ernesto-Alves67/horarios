@@ -85,14 +85,11 @@ fun DailyScreen(
     LaunchedEffect(latestVersion, downloadUrl) {
         if( latestVersion != null) {
             val currentVersion = BuildConfig.VERSION_NAME
-            val isNewer = currentVersion.compareVersionsSimple(latestVersion!!)
-            val isNewer2 = latestVersion.compareVersionsSimple(currentVersion!!)
-            Log.d("DailyScreen", "Versão atual: $currentVersion, Última versão: $latestVersion, isNewer: $isNewer")
-            Log.d("DailyScreen", "isNewer2: $isNewer2")
+            val isNewer = currentVersion.compareVersionsSimple(latestVersion)
             if (
                 downloadUrl != null && isNewer == -1
             ) {
-                Log.d("DailyScreen", "Nova versão disponível: $latestVersion")
+
                 showDialog = true
             }
         }
