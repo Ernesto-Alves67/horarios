@@ -30,7 +30,7 @@ android {
         minSdk = 29
         targetSdk = 36
         versionCode = 1
-        versionName = "1.10.5"
+        versionName = "v1.10.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -58,8 +58,8 @@ android {
         getByName("debug") {
             isDebuggable =  true
 
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+//            applicationIdSuffix = ".debug"
+//            versionNameSuffix = "-debug"
 
             isMinifyEnabled = false
             isShrinkResources = false

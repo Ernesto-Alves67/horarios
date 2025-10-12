@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.api.services.GitHubService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +19,11 @@ class UpdateViewModel @Inject constructor(
     private val api: GitHubService
 ) : ViewModel() {
 
-    var latestVersion by mutableStateOf<String?>(null)
-        private set
+    private val _lastVersion = MutableStateFlow("")
+    var latestVersion: StateFlow<String> = _lastVersion
 
-    var downloadUrl by mutableStateOf<String?>(null)
-        private set
+    private val _downloadUrl = MutableStateFlow("")
+    var downloadUrl: StateFlow<String> = _downloadUrl
 
     init {
         checkForUpdate()
@@ -35,8 +37,8 @@ class UpdateViewModel @Inject constructor(
                 Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: ${release.tagName}")
                 Log.d("UpdateCheck", "Release details: $release")
                 if (release.tagName != currentVersion) {
-                    latestVersion = release.tagName
-                    downloadUrl = release.assets?.firstOrNull()?.downloadUrl
+                    _lastVersion.value = release.tagName
+                    _downloadUrl.value = release.assets?.firstOrNull()?.downloadUrl.toString()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
