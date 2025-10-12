@@ -29,7 +29,7 @@ class UpdateViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val release = api.api.getLatestRelease()
-                val currentVersion = "v${BuildConfig.VERSION_NAME}"
+                val currentVersion = BuildConfig.VERSION_NAME
                 if (release.tagName != currentVersion) {
                     _lastVersion.value = release.tagName
                     _downloadUrl.value = release.assets?.firstOrNull()?.downloadUrl.toString()

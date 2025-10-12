@@ -1,6 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
-import android.util.Log
+//import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -86,6 +86,7 @@ fun DailyScreen(
         if( latestVersion != null) {
             val currentVersion = BuildConfig.VERSION_NAME
             val isNewer = currentVersion.compareVersionsSimple(latestVersion)
+//            Log.d("DailyScreen", "Current: $currentVersion, Latest: $latestVersion, isNewer: $isNewer")
             if (
                 downloadUrl != null && isNewer == -1
             ) {
