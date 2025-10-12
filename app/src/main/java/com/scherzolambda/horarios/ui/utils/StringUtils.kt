@@ -39,13 +39,13 @@ fun String.compareVersionsSimple(other: String): Int {
         val thisValue = thisSegments.getOrElse(i) { "0" }.toIntOrNull() ?: 0
         val otherValue = otherSegments.getOrElse(i) { "0" }.toIntOrNull() ?: 0
 
-        // Compara os valores numéricos
         if (thisValue != otherValue) {
-            // Se forem diferentes, retorna a diferença para determinar se é maior ou menor
+            // -1 se thisValue < otherValue
+            //  1 se thisValue > otherValue
             return thisValue.compareTo(otherValue)
         }
     }
 
-    // Se todos os segmentos forem iguais, as versões são iguais
+    // as versões são iguais
     return 0
 }
