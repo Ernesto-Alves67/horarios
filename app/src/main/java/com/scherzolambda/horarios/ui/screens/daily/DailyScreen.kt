@@ -1,5 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
@@ -72,8 +74,8 @@ fun DailyScreen(
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
     val isLoading by disciplinaViewModel.isLoading.collectAsState()
-    var latestVersion = updateViewModel.latestVersion
-    var downloadUrl = updateViewModel.downloadUrl
+    val latestVersion by updateViewModel.latestVersion.collectAsState()
+    val downloadUrl by updateViewModel.downloadUrl.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsState()
     val disciplinasHoje = remember(horariosSemanalState) {
@@ -83,10 +85,11 @@ fun DailyScreen(
     LaunchedEffect(latestVersion, downloadUrl) {
         if( latestVersion != null) {
             val currentVersion = BuildConfig.VERSION_NAME
-            val isNewer = currentVersion.compareVersionsSimple(latestVersion!!)
+            val isNewer = currentVersion.compareVersionsSimple(latestVersion)
             if (
                 downloadUrl != null && isNewer == -1
             ) {
+
                 showDialog = true
             }
         }
@@ -228,8 +231,8 @@ fun DailyScreen(
                 latestVersion = latestVersion,
                 downloadUrl = downloadUrl,
                 onDismiss = {
-                    downloadUrl = null
-                    latestVersion = null
+//                    downloadUrl = null
+//                    latestVersion.value = ""
                     showDialog = false }
             )
         }
