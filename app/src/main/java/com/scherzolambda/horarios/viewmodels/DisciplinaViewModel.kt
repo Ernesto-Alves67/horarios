@@ -1,4 +1,4 @@
-package com.scherzolambda.horarios.viewmodel
+package com.scherzolambda.horarios.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

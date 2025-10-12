@@ -1,4 +1,4 @@
-package com.scherzolambda.horarios.viewmodel
+package com.scherzolambda.horarios.viewmodels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

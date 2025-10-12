@@ -45,6 +45,7 @@ import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.ui.theme.AppTheme
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
+import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 
 
 @Composable

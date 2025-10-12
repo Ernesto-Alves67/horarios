@@ -1,7 +1,6 @@
 package com.scherzolambda.horarios.ui.screens.status
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -39,7 +38,7 @@ import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatGreen
-import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
+import com.scherzolambda.horarios.viewmodels.DisciplinaViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.InputStream

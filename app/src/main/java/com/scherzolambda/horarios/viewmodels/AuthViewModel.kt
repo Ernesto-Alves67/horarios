@@ -1,4 +1,4 @@
-package com.scherzolambda.horarios.viewmodel
+package com.scherzolambda.horarios.viewmodels
 
 import android.util.Log
 import androidx.compose.runtime.State

@@ -45,7 +45,7 @@ import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
 import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
-import com.scherzolambda.horarios.ui.screens.config.ConfigViewModel
+import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
@@ -54,8 +54,8 @@ import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
 import com.scherzolambda.horarios.ui.theme.UfcatGreen
-import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
-import com.scherzolambda.horarios.viewmodel.UpdateViewModel
+import com.scherzolambda.horarios.viewmodels.DisciplinaViewModel
+import com.scherzolambda.horarios.viewmodels.UpdateViewModel
 import kotlinx.coroutines.launch
 
 /**

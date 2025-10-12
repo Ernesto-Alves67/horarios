@@ -1,6 +1,5 @@
 package com.scherzolambda.horarios
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,18 +7,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
 import com.scherzolambda.horarios.ui.navigation.MainNavigation
 import com.scherzolambda.horarios.ui.theme.ApplicationTheme
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.lifecycleScope
-import com.scherzolambda.horarios.viewmodel.AuthViewModel
+import com.scherzolambda.horarios.viewmodels.AuthViewModel
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

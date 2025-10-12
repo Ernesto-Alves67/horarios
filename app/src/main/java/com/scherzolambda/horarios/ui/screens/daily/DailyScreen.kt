@@ -39,18 +39,17 @@ import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
+import com.scherzolambda.horarios.ui.components.DialogInfoRow
 import com.scherzolambda.horarios.ui.screens.daily.components.HoursOfDayComponent
 import com.scherzolambda.horarios.ui.screens.daily.components.InfoCollumn
 import com.scherzolambda.horarios.ui.screens.daily.components.existeDisciplinaNoTurno
 import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
-import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
-import com.scherzolambda.horarios.ui.theme.Transparent
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.ui.utils.compareVersionsSimple
-import com.scherzolambda.horarios.viewmodel.AppUpdateInfo
+import com.scherzolambda.horarios.viewmodels.AppUpdateInfo
 
 /**
  * Tela que exibe as aulas do dia atual, organizadas por turno (manhã, tarde, noite).
