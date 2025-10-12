@@ -38,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.scherzolambda.horarios.BuildConfig
@@ -130,6 +129,55 @@ fun ConfigScreen(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTopBar(
+    title: String,
+    onBack: () -> Unit,
+    backgroundColor: Color = LocalAppColors.current.content.background,
+    titleColor: Color = LocalAppColors.current.content.blackText,
+    rippleColor: Color = LocalAppColors.current.content.grayElements,
+    rightContent: @Composable (() -> Unit)? = null // Conteúdo à direita (ícones adicionais)
+) {
+    TopAppBar(
+        navigationIcon = {
+            val interactionSource = remember { MutableInteractionSource() }
+            IconButton(
+                onClick = onBack,
+                interactionSource = interactionSource,
+                modifier = Modifier.indication(
+                    interactionSource = interactionSource,
+                    indication = ripple(
+                        bounded = false, // ou true
+                        color = rippleColor
+                    )
+                )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_back_arrow),
+                    contentDescription = "Voltar",
+                    tint = titleColor,
+                )
+            }
+        },
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = titleColor
+            )
+        },
+        actions = {
+            rightContent?.invoke() // Adiciona ações à direita, se houver
+        },
+        colors = topAppBarColors(
+            containerColor = backgroundColor
+        ),
+    )
+}
+
+
 @Composable
 fun SecaoTitulo(texto: String) {
     Text(
@@ -150,6 +198,7 @@ fun ItemConfiguracao(titulo: String, descricao: String? = null) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.content.whiteText)
     ) {
         Row(
@@ -168,7 +217,7 @@ fun ItemConfiguracao(titulo: String, descricao: String? = null) {
                     Text(
                         text = it,
                         color = Color.Gray,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelMedium,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -192,6 +241,7 @@ fun ItemSwitch3(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = LocalAppColors.current.content.whiteText
         )
@@ -252,6 +302,7 @@ fun ItemSwitchLayout(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = LocalAppColors.current.content.whiteText
         )
@@ -331,54 +382,6 @@ fun TemaSwitchGroup(
         )
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CustomTopBar(
-    title: String,
-    onBack: () -> Unit,
-    backgroundColor: Color = LocalAppColors.current.content.background,
-    titleColor: Color = LocalAppColors.current.content.blackText,
-    rippleColor: Color = LocalAppColors.current.content.grayElements,
-    rightContent: @Composable (() -> Unit)? = null // Conteúdo à direita (ícones adicionais)
-) {
-    TopAppBar(
-        navigationIcon = {
-            val interactionSource = remember { MutableInteractionSource() }
-            IconButton(
-                onClick = onBack,
-                interactionSource = interactionSource,
-                modifier = Modifier.indication(
-                    interactionSource = interactionSource,
-                    indication = ripple(
-                        bounded = false, // ou true
-                        color = rippleColor
-                    )
-                )
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_back_arrow),
-                    contentDescription = "Voltar",
-                    tint = titleColor,
-                )
-            }
-        },
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = titleColor
-            )
-        },
-        actions = {
-            rightContent?.invoke() // Adiciona ações à direita, se houver
-        },
-        colors = topAppBarColors(
-            containerColor = backgroundColor
-        ),
-    )
-}
-
 
 @Composable
 fun ItemSwitch2(

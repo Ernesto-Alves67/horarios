@@ -1,13 +1,10 @@
 package com.scherzolambda.horarios.ui.screens.daily
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,14 +39,14 @@ import com.scherzolambda.horarios.BuildConfig
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
+import com.scherzolambda.horarios.ui.screens.daily.components.HoursOfDayComponent
+import com.scherzolambda.horarios.ui.screens.daily.components.InfoCollumn
+import com.scherzolambda.horarios.ui.screens.daily.components.existeDisciplinaNoTurno
 import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
-import com.scherzolambda.horarios.ui.theme.M_PeriodColor
-import com.scherzolambda.horarios.ui.theme.N_PeriodColor
-import com.scherzolambda.horarios.ui.theme.T_PeriodColor
-import com.scherzolambda.horarios.ui.theme.UfcatBlack
+import com.scherzolambda.horarios.ui.theme.Transparent
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.ui.utils.compareVersionsSimple
@@ -125,11 +122,18 @@ fun DailyScreen(
                     )
                 }
                 false -> {
+                    val glassBrush = Brush.horizontalGradient(
+                        colors = listOf(
+                            UfcatRed,
+                            Color(0xFFFF3366), // tom rosa-avermelhado
+                            Color(0xFFFF6600),  // tom laranja
+                            UfcatOrangeDark
+                        )
+
+                    )
                     // Header fixo no topo
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
+                    Card(
+                        modifier = Modifier.padding(16.dp)
                             .background(
                                 brush = Brush.horizontalGradient(
                                     colors = listOf(
@@ -141,15 +145,28 @@ fun DailyScreen(
                                 ),
                                 shape = RoundedCornerShape(12.dp)
                             )
-                            .padding(vertical = 8.dp, horizontal = 8.dp)
-                    ) {
+                            .padding(vertical = 8.dp, horizontal = 8.dp),
+                        elevation = CardDefaults.cardElevation(8.dp),){
+
                         Text(
                             text = "Aulas de Hoje",
                             fontSize = 32.sp,
                             fontWeight = Bold,
                             color = LocalAppColors.current.content.blackText,
-                            modifier = Modifier.align(Alignment.Center)
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(glassBrush)
+                                .align(Alignment.CenterHorizontally)
                         )
+//                        Box(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(16.dp)
+//                                .background(color = Color.Unspecified)
+//
+//                        ) {
+//                        }
                     }
 
                     Column(
@@ -227,149 +244,4 @@ fun DailyScreen(
             )
         }
     }
-}
-
-@Composable
-fun HoursOfDayComponent(
-    hourType: HourType,
-    isShowEmpty: Boolean,
-    disciplinasHoje: List<HorarioSemanal>,
-    onDisciplinaClick: (HorarioSemanal) -> Unit
-) {
-    val hourMap = HourMaps.getHourMap(hourType)
-    val disciplinasPorHora = remember(disciplinasHoje, hourType) {
-        disciplinasHoje
-            .filter { it.periodo == hourType }
-            .groupBy { it.horario }
-    }
-
-    Card(
-        modifier = Modifier.padding(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = LocalAppColors.current.content.whiteText
-        )
-    ) {
-        // determine background color for this turno (same as WeeklyScreen)
-        val (periodoColor, turnoLabel) = when (hourType) {
-            HourType.M -> M_PeriodColor to "Turno Manhã"
-            HourType.T -> T_PeriodColor to "Turno Tarde"
-            HourType.N -> N_PeriodColor to "Turno Noite"
-        }
-        Text(turnoLabel,
-            modifier = Modifier.padding(16.dp),
-            color = LocalAppColors.current.content.blackText,
-            fontWeight = Bold, fontSize = 20.sp)
-
-
-        // Espaçamento entre blocos de horário
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            hourMap.forEach { (index, hour) ->
-                val disciplinasNoHorario = disciplinasPorHora[index].orEmpty()
-                Log.d("DailyScreen", "HourType: $hourType, HourIndex: $index, Disciplinas: $disciplinasNoHorario")
-                if(disciplinasNoHorario.isEmpty()){
-                    if (isShowEmpty){
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = periodoColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-
-                            // Cabeçalho do horário (índice + label)
-                            Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp,bottom = 4.dp)) {
-                                Text("$index - ",
-                                    color = UfcatBlack,
-                                    fontWeight = Bold,
-                                    fontSize = 18.sp)
-                                Text(hour, color = UfcatBlack)
-                            }
-                            Text(
-                                text = "Horário vago",
-                                fontSize = 16.sp,
-                                color = UfcatBlack,
-                                fontWeight = Bold,
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                            )
-                        }
-                    }
-                    Log.d("DailyScreen", "Exibindo horário vazio para HourType: $hourType, HourIndex: $index")
-                }else{
-
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(color = periodoColor, shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
-                            .padding(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-
-                        // Cabeçalho do horário (índice + label)
-                        Row(modifier = Modifier.fillMaxWidth().padding(start = 8.dp,bottom = 4.dp)) {
-                            Text("$index - ",
-                                color = UfcatBlack,
-                                fontWeight = Bold,
-                                fontSize = 18.sp)
-                            Text(hour, color = UfcatBlack)
-                        }
-                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            disciplinasNoHorario.forEach { disciplina ->
-                                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                                    Text(
-                                        text = disciplina.disciplina,
-                                        fontSize = 18.sp,
-                                        color = UfcatBlack,
-                                        fontWeight = Bold,
-                                        modifier = Modifier
-                                            .padding(start = 8.dp)
-                                            .clickable { onDisciplinaClick(disciplina) }
-                                    )
-                                    Text(
-                                        text = disciplina.local,
-                                        fontSize = 14.sp,
-                                        color = UfcatBlack,
-                                        modifier = Modifier.padding(start = 8.dp)
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoCollumn(
-    title: String,
-    info: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = Bold,
-            color = LocalAppColors.current.content.blackText
-        )
-        Text(
-            text = info,
-            fontSize = 16.sp,
-            color = LocalAppColors.current.content.blackText
-        )
-    }
-}
-
-fun existeDisciplinaNoTurno(disciplinasHoje: List<HorarioSemanal>, hourType: HourType): Boolean {
-    return disciplinasHoje.any { it.periodo == hourType }
 }
