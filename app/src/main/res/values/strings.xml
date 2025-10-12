@@ -1,3 +1,60 @@
 <resources>
     <string name="app_name">Horários</string>
+
+    <string name="privacy_policy_markdown">
+        <![CDATA[
+## Política de Privacidade
+
+Este documento descreve como o aplicativo **Horários** (o "App"), desenvolvido por **Ernesto-Alves**, coleta, usa e protege as informações limitadas que você fornece.
+
+**Ao utilizar o App, você concorda com a coleta e uso de informações de acordo com esta política.**
+
+### 1. Coleta de Informações
+
+Para o funcionamento e monitoramento do uso do App, são coletadas as seguintes informações **diretamente do dispositivo e inseridas por você durante a configuração inicial**:
+
+| Categoria da Informação | Exemplo | Propósito da Coleta |
+| :--- | :--- | :--- |
+| **Identificação** | Nome, Curso | Mapear e entender o perfil de uso dentro da comunidade acadêmica. |
+| **Dispositivo/Técnico** | Nome do dispositivo, Versão do Android, Versão do App | Monitorar a distribuição, compatibilidade e rastrear a conclusão da configuração. |
+
+**Não coletamos:**
+
+* Informações de localização precisa (GPS).
+* Dados de uso em tempo real (como horários que o app é aberto).
+* Quaisquer informações sensíveis que não sejam estritamente necessárias para a identificação básica dentro da comunidade universitária.
+
+### 2. Uso das Informações Coletadas
+
+As informações coletadas são utilizadas exclusivamente para os seguintes propósitos:
+
+1.  **Mapeamento de Usuários:** Para entender quantos e quais perfis de estudantes (curso) estão utilizando o aplicativo, especialmente devido à sua distribuição fora de lojas oficiais (como a Google Play Store).
+2.  **Suporte Técnico e Desenvolvimento:** As informações do dispositivo e da versão do Android/App ajudam a diagnosticar erros e garantir a compatibilidade e o desenvolvimento de novas *releases*.
+3.  **Objetivo Acadêmico (TCC):** Os dados anônimos e estatísticos podem ser usados como base de análise e estudo no Trabalho de Conclusão de Curso (TCC) do desenvolvedor, sobre a arquitetura e distribuição do aplicativo.
+
+### 3. Compartilhamento e Venda de Dados
+
+**O desenvolvedor do *Horários* não vende, aluga ou compartilha suas informações pessoais com terceiros, empresas de publicidade ou outras organizações, sob nenhuma circunstância.**
+
+Os dados são mantidos de forma segura e utilizados apenas para os propósitos descritos acima.
+
+### 4. Segurança dos Dados
+
+Comprometemo-nos a proteger as informações que você nos confia. Adotamos medidas razoáveis para impedir o acesso, a divulgação, a modificação ou a destruição não autorizada dos seus dados. No entanto, é importante lembrar que nenhum método de transmissão pela Internet, ou método de armazenamento eletrônico, é 100% seguro.
+
+### 5. Links para Outros Sites
+
+O código-fonte do **Horários** é aberto e está disponível no GitHub. Esta Política de Privacidade se aplica apenas às informações coletadas pelo aplicativo. Não nos responsabilizamos pelas práticas de privacidade de sites ou plataformas de terceiros (como o GitHub).
+
+### 6. Alterações a Esta Política de Privacidade
+
+Esta Política de Privacidade pode ser atualizada periodicamente. Recomendamos que você revise esta página ocasionalmente para quaisquer alterações. As alterações a esta Política de Privacidade são efetivas quando são publicadas no App ou na página do projeto no GitHub.
+
+### 7. Contato
+
+Se você tiver alguma dúvida sobre esta Política de Privacidade, as práticas deste App ou suas interações com ele, por favor, entre em contato com o desenvolvedor através do email:
+
+**ernesto487dev@gmail.com**
+        ]]>
+    </string>
 </resources>
