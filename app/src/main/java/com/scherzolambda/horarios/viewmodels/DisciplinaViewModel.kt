@@ -129,20 +129,25 @@ class DisciplinaViewModel @Inject constructor(
             deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
         )
         viewModelScope.launch {
-            val result = repository.saveUserData(userData)
-            result.enqueue(object : Callback<AuthResponse> {
-                override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
-                    if (response.isSuccessful) {
-                        Log.i("disciplinaVM", "User data saved successfully")
-                    } else {
-                        Log.e("DisciplinaVM", "Failed to save user data: ${response.errorBody()?.string()}")
-                    }
-                }
+            try {
 
-                override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
-                    Log.e("DisciplinaVM", "Error saving user data ${t.message}", t)
-                }
-            })
+                val result = repository.saveUserData(userData)
+                result.enqueue(object : Callback<AuthResponse> {
+                    override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                        if (response.isSuccessful) {
+                            Log.i("disciplinaVM", "User data saved successfully")
+                        } else {
+                            Log.e("DisciplinaVM", "Failed to save user data: ${response.errorBody()?.string()}")
+                        }
+                    }
+
+                    override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
+                        Log.e("DisciplinaVM", "Error saving user data ${t.message}", t)
+                    }
+                })
+            }catch (e: Exception) {
+                Log.e("DisciplinaVM", "Exception saving user data: ${e.message}", e)
+            }
         }
     }
 
@@ -158,11 +163,15 @@ class DisciplinaViewModel @Inject constructor(
             deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
         )
         viewModelScope.launch {
-            val result = repository.updateUserData(userData)
-            if(result.isSuccessful) {
-                Log.i("disciplinaVM", "User data Updated successfully")
-            } else {
-                Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+            try {
+                val result = repository.updateUserData(userData)
+                if(result.isSuccessful) {
+                    Log.i("disciplinaVM", "User data Updated successfully")
+                } else {
+                    Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+                }
+            }catch (e: Exception) {
+                Log.e("DisciplinaVM", "Exception updating user data: ${e.message}", e)
             }
         }
     }

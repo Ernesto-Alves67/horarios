@@ -20,16 +20,23 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     init {
         initializeApp()
     }
+    //TODO: Analisar desempenho do app quando sem acesso a internet na inicialização
     fun initializeApp() {
         viewModelScope.launch {
-            val result = repository.initializeSession()
-            if (result.isSuccessful) {
-                result.body()?.let {
-                    setAccessToken(it.accessToken)
+            try {
+                val result = repository.initializeSession()
+                if (result.isSuccessful) {
+                    result.body()?.let {
+                        setAccessToken(it.accessToken)
+                    }
+                } else {
+                    Log.e("AuthViewModel", "Failed to initialize session: ${result.errorBody()?.string()}")
                 }
-                _isSplashVisible.value = false // Aqui esconde a splash screen
-            } else {
-                Log.e("AuthViewModel", "Failed to initialize session: ${result.errorBody()?.string()}")
+            } catch (e: java.io.IOException) {
+                Log.e("AuthViewModel", "Network error initializing session", e)
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Unexpected error initializing session", e)
+            } finally {
                 _isSplashVisible.value = false // Mesmo em caso de falha, esconde a splash
             }
 

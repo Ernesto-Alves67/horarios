@@ -119,7 +119,7 @@ fun montarHorariosSemanaisDeDisciplinas(disciplinas: List<Disciplina>): List<Hor
  * @return Lista de horários que ocorrem no dia atual da semana
  */
 fun filtrarHorariosDoDiaAtual(horarios: List<HorarioSemanal>): List<HorarioSemanal> {
-    val diaAtual = 4//LocalDate.now().dayOfWeek.value + 1 // 2=segunda
+    val diaAtual = LocalDate.now().dayOfWeek.value + 1 // 2=segunda
     return horarios.filter { it.diaSemana == diaAtual }
 }
 

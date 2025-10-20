@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,12 +23,13 @@ fun WeeklyScreen(
     horarios: List<HorarioSemanal>,
     isLoading: Boolean,
     isShowEmptyCells: Boolean,
+    paddingValues: PaddingValues
 ) {
 
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
-            .padding(4.dp)
+            .padding(paddingValues)
             .fillMaxHeight()
             .background(LocalAppColors.current.content.background)
     ) {

@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,7 +47,8 @@ import kotlin.io.path.createTempFile
 
 @Composable
 fun StatusScreen(
-    disciplinaViewModel: DisciplinaViewModel
+    disciplinaViewModel: DisciplinaViewModel,
+    paddingValues: PaddingValues
 ) {
     val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
     val disciplinas = disciplinasState.value
@@ -83,7 +85,7 @@ fun StatusScreen(
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
+            .padding(paddingValues)
     ) {
         val (lazyListRef, fileLoadedRef, loadingRef) = createRefs()
 

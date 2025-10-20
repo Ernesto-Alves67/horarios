@@ -2,6 +2,7 @@ package com.scherzolambda.horarios.ui.screens.config
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -52,7 +53,9 @@ import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 fun ConfigScreen(
     onBack: () -> Unit,
     themeViewModel: ThemeViewModel,
-    configViewModel: ConfigViewModel
+    configViewModel: ConfigViewModel,
+    onNavigateToPrivacyPolicy: () -> Unit,
+    onNavigateToUserContract: () -> Unit
 ) {
     val themeState by themeViewModel.theme.collectAsState()
 
@@ -89,7 +92,7 @@ fun ConfigScreen(
             SecaoTitulo("TEMA")
             TemaSwitchGroup(
                 selectedTheme = themeState,
-                onThemeChange = { themeViewModel.setTheme(it) }
+                onThemeChange = themeViewModel::setTheme
             )
 
             SecaoTitulo("LAYOUT")
@@ -116,8 +119,13 @@ fun ConfigScreen(
             // --- SOBRE ---
             SecaoTitulo("SOBRE")
 
-            ItemConfiguracao( "Política de Privacidade")
-            ItemConfiguracao( "Contrato de Usuário")
+            ItemConfiguracao(
+                titulo = "Política de Privacidade",
+                onClick = onNavigateToPrivacyPolicy)
+            ItemConfiguracao(
+                titulo="Contrato de Usuário",
+                onClick = onNavigateToUserContract
+                )
             ItemConfiguracao( titulo="Versão",
                 descricao = BuildConfig.VERSION_NAME)
 
@@ -191,13 +199,18 @@ fun SecaoTitulo(texto: String) {
 }
 
 @Composable
-fun ItemConfiguracao(titulo: String, descricao: String? = null) {
+fun ItemConfiguracao(
+    titulo: String,
+    descricao: String? = null,
+    onClick: (() -> Unit)?= null){
     val modifier = remember { Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp) }
 
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable{
+            onClick?.invoke()
+        },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.content.whiteText)
