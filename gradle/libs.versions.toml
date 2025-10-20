@@ -1,4 +1,5 @@
 [versions]
+accompanistNavigationAnimation = "0.36.0"
 agp = "8.13.0"
 kotlin = "2.0.21"
 coreKtx = "1.17.0"
@@ -14,6 +15,7 @@ material3 = "1.4.0"
 
 
 [libraries]
+accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

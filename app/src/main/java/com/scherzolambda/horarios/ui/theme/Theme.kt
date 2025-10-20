@@ -1,44 +1,40 @@
 package com.scherzolambda.horarios.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 
 
-private val DarkColorScheme = darkColorScheme(
-    primary = UfcatGray,
-    secondary = UfcatOrangeDark,
-    tertiary = White,
-    background = UfcatBlack2
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = UfcatGreen,
-    secondary = UfcatOrange,
-    tertiary = UfcatOrangeDark,
-    background = UfcatGray
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
-)
+//private val DarkColorScheme = darkColorScheme(
+//    primary = UfcatGray,
+//    secondary = UfcatOrangeDark,
+//    tertiary = White,
+//    background = UfcatBlack2
+//)
+//
+//private val LightColorScheme = lightColorScheme(
+//    primary = UfcatGreen,
+//    secondary = UfcatOrange,
+//    tertiary = UfcatOrangeDark,
+//    background = UfcatGray
+//
+//    /* Other default colors to override
+//    background = Color(0xFFFFFBFE),
+//    surface = Color(0xFFFFFBFE),
+//    onPrimary = Color.White,
+//    onSecondary = Color.White,
+//    onTertiary = Color.White,
+//    onBackground = Color(0xFF1C1B1F),
+//    onSurface = Color(0xFF1C1B1F),
+//    */
+//)
 
 @Composable
 fun ApplicationTheme(
     appTheme: AppTheme = AppTheme.SYSTEM,
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val isDark = when (appTheme) {
@@ -52,7 +48,10 @@ fun ApplicationTheme(
             primary = appColors.content.primary,
             background = appColors.content.background,
             onPrimary = appColors.content.background,
-            onBackground = appColors.content.grayElements
+            onBackground = appColors.content.grayElements,
+//            onSurface = appColors.content.background,
+//            onSurfaceVariant = appColors.content.background,
+            secondary = appColors.content.background
         )
     } else {
         lightColorScheme(
@@ -60,7 +59,9 @@ fun ApplicationTheme(
             background = appColors.content.background,
             onPrimary = appColors.content.background,
             surface = appColors.content.grayElements,
-            onSurface = appColors.content.blackText,
+//            onSurface = appColors.content.background,
+//            onSurfaceVariant = appColors.content.background,
+            secondary = appColors.content.background
         )
     }
     CompositionLocalProvider(LocalAppColors provides appColors) {
@@ -71,11 +72,11 @@ fun ApplicationTheme(
         )
     }
 }
-
-object HorariosThemes {
-    object color {
-        val background @Composable get() = MaterialTheme.colorScheme.background
-        val primary @Composable get() = MaterialTheme.colorScheme.primary
-        val secondary @Composable get() = MaterialTheme.colorScheme.secondary
-    }
-}
+//
+//object HorariosThemes {
+//    object color {
+//        val background @Composable get() = MaterialTheme.colorScheme.background
+//        val primary @Composable get() = MaterialTheme.colorScheme.primary
+//        val secondary @Composable get() = MaterialTheme.colorScheme.secondary
+//    }
+//}

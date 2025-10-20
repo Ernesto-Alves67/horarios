@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -47,6 +48,7 @@ import com.scherzolambda.horarios.ui.theme.AppTheme
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import com.scherzolambda.horarios.viewmodels.ConfigViewModel
+import androidx.core.net.toUri
 
 
 @Composable
@@ -62,6 +64,7 @@ fun ConfigScreen(
     val showEmptyDaily by configViewModel.showEmptyDailyCell.collectAsState()
     val showEmptyWeekly by configViewModel.showEmptyWeeklyCell.collectAsState()
 
+    val context = LocalContext.current
     // TODO: SOBRE a aplicação
     // TODO: Termos de uso e política de privacidade
 
@@ -83,6 +86,7 @@ fun ConfigScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(LocalAppColors.current.content.background)
                 .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
         ) {
@@ -131,7 +135,14 @@ fun ConfigScreen(
 
             // --- SUPORTE ---
             SecaoTitulo("SUPORTE")
-            ItemConfiguracao( "Relatar problemas e sugestões")
+            ItemConfiguracao(
+                titulo="Relatar problemas e sugestões",
+                onClick = {
+                    val url = "https://github.com/Ernesto-Alves67/horarios/issues"
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW,
+                        url.toUri())
+                    context.startActivity(intent)
+                })
 
         }
     }

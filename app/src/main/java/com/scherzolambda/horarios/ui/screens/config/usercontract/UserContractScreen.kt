@@ -1,16 +1,17 @@
 package com.scherzolambda.horarios.ui.screens.config.usercontract
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.remember
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.BasicRichText
 import com.halilibo.richtext.ui.RichTextThemeProvider
@@ -65,23 +66,32 @@ fun UserAgreementScreen(
     val textColor = LocalAppColors.current.content.blackText
     Scaffold(
         containerColor = LocalAppColors.current.content.grayElements,
-        topBar = { CustomTopBar(title = "Politica de privacidade", onBack = onBack) }
+        topBar = { CustomTopBar(title = "Contrato do usuário", onBack = onBack) }
     ) { innerPadding ->
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
-        ) {
-            RichTextThemeProvider(
-                contentColorProvider = { textColor } // passa a cor dinamicamente
+                .background(LocalAppColors.current.content.background)
+        ){
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(LocalAppColors.current.content.background)
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
             ) {
-                BasicRichText(
-                    modifier = Modifier.padding(20.dp)
-                ){
-                    // dentro do RichText scope você chama o Markdown que já usa a content color
-                    Markdown(content = agreementText) // (do módulo richtext-commonmark)
+                RichTextThemeProvider(
+                    contentColorProvider = { textColor }
+                ) {
+                    BasicRichText(
+                        modifier = Modifier.padding(20.dp)
+                    ){
+
+                        Markdown(content = agreementText)
+                    }
                 }
             }
         }

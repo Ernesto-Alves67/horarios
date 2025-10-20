@@ -1,22 +1,19 @@
 package com.scherzolambda.horarios.ui.screens.config.policy
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.halilibo.richtext.markdown.Markdown
 import com.halilibo.richtext.ui.BasicRichText
-import com.halilibo.richtext.ui.RichTextStyle
 import com.halilibo.richtext.ui.RichTextThemeProvider
-import com.halilibo.richtext.ui.currentRichTextStyle
 import com.scherzolambda.horarios.ui.screens.config.CustomTopBar
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 
@@ -52,9 +49,9 @@ fun PrivacyPolicyScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                // Permite a rolagem para documentos longos
+                .background(LocalAppColors.current.content.background)
                 .verticalScroll(rememberScrollState())
-                .padding(all= 20.dp)
+                .padding(all = 20.dp)
         ) {
             RichTextThemeProvider(
                 contentColorProvider = { textColor } // passa a cor dinamicamente
