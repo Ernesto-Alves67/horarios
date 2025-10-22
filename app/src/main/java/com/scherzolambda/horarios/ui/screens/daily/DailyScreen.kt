@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.scherzolambda.horarios.BuildConfig
@@ -110,85 +111,78 @@ fun DailyScreen(
             }
         } else {
 
-            when(disciplinasHoje.isEmpty()){
-                true -> {
-                    InfoCollumn(
-                        title = "Nenhuma aula hoje",
-                        info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
-                }
-                false -> {
-                    val glassBrush = Brush.horizontalGradient(
-                        colors = listOf(
-                            UfcatRed,
-                            Color(0xFFFF3366), // tom rosa-avermelhado
-                            Color(0xFFFF6600),  // tom laranja
-                            UfcatOrangeDark
-                        )
-
-                    )
-                    // Header fixo no topo
-                    Card(
-                        modifier = Modifier.padding(16.dp)
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        UfcatRed,
-                                        Color(0xFFFF3366), // tom rosa-avermelhado
-                                        Color(0xFFFF6600),  // tom laranja
-                                        UfcatOrangeDark
-                                    )
-                                ),
-                                shape = RoundedCornerShape(12.dp)
-                            )
-                            .padding(vertical = 8.dp, horizontal = 8.dp),
-                        elevation = CardDefaults.cardElevation(8.dp),){
-
-                        Text(
-                            text = "Aulas de Hoje",
-                            fontSize = 32.sp,
-                            fontWeight = Bold,
-                            color = LocalAppColors.current.content.blackText,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(glassBrush)
-                                .align(Alignment.CenterHorizontally)
-                        )
-//                        Box(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .padding(16.dp)
-//                                .background(color = Color.Unspecified)
+//            when(disciplinasHoje.isEmpty()){
+//                true -> {
+//                    InfoCollumn(
+//                        title = "Nenhuma aula hoje",
+//                        info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(16.dp)
+//                    )
+//                }
+//                false -> {
 //
-//                        ) {
-//                        }
-                    }
+//                }
+//
+//            }
+            val glassBrush = Brush.horizontalGradient(
+                colors = listOf(
+                    UfcatRed,
+                    Color(0xFFFF3366), // tom rosa-avermelhado
+                    Color(0xFFFF6600),  // tom laranja
+                    UfcatOrangeDark
+                )
 
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(rememberScrollState())
-                            .padding(4.dp),
-                        verticalArrangement = Arrangement.Top
-                    ) {
-                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
-                            HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
-                        }
-                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
-                            HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
-                        }
-                        if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
-                            HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
-                        }
+            )
+            // Header fixo no topo
+            Card(
+                modifier = Modifier.padding(16.dp)
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                UfcatRed,
+                                Color(0xFFFF3366), // tom rosa-avermelhado
+                                Color(0xFFFF6600),  // tom laranja
+                                UfcatOrangeDark
+                            )
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(vertical = 8.dp, horizontal = 8.dp),
+                elevation = CardDefaults.cardElevation(8.dp),){
 
-                        Spacer(modifier = Modifier.padding(8.dp))
-                    }
+                Text(
+                    text = "Aulas de Hoje",
+                    fontSize = 32.sp,
+                    fontWeight = Bold,
+                    color = LocalAppColors.current.content.white,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(glassBrush)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(paddingValues),
+                verticalArrangement = Arrangement.Top
+            ) {
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
+                    HoursOfDayComponent(hourType = HourType.M, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
+                }
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.T)) {
+                    HoursOfDayComponent(hourType = HourType.T, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
+                }
+                if (existeDisciplinaNoTurno(disciplinasHoje, HourType.N)) {
+                    HoursOfDayComponent(hourType = HourType.N, disciplinasHoje = disciplinasHoje, onDisciplinaClick = { selectedCell = it }, isShowEmpty = isShowEmptyCells)
                 }
 
+                Spacer(modifier = Modifier.padding(8.dp))
             }
 
         }
@@ -243,4 +237,26 @@ fun DailyScreen(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun DailyScreenPreview() {
+    val sampleDisciplinas = listOf(
+        HorarioSemanal(
+            disciplina = "Cálculo I",
+            local = "Sala 101",
+            docente = "Prof. João Silva",
+            periodo = HourType.M,
+            horario = 2,
+            diaSemana = 3
+        )
+    )
+    DailyScreen(
+        paddingValues = PaddingValues(3.dp),
+        disciplinasHoje = sampleDisciplinas,
+        isLoading = false,
+        isShowEmptyCells = false,
+        updateInfo = AppUpdateInfo("","")
+    )
 }

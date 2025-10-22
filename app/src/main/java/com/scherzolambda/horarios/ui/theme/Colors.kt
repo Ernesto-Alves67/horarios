@@ -8,10 +8,7 @@ val White = Color(0xFFFFFFFF)
 val UfcatBlack = Color(0xFF000000)
 val UfcatBlack2 = Color(0xFF0B2408)
 
-//val primaryColor = 0xFF297A7D // Verde mandacaru
-//val secondaryColor = 0xFFFD841A // Laranja luminoso
-//val tertiaryColor = 0xFFE1DEE3 // Cinza nébula
-//
+
 val UfcatOrange = Color(0xFFFD841A)
 val UfcatGreen = Color(0xFF297A7D)
 val UfcatGray = Color(0xFFE1DEE3)
