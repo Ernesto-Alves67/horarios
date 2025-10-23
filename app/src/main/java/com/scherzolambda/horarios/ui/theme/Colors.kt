@@ -19,7 +19,7 @@ val UfcatGray = Color(0xFFE1DEE3)
 val UfcatGrayDark = Color(0xFF242121)
 val UfcatRed = Color(0xFFEE2D55)
 val UfcatOrangeDark = Color(0xFFFF8C00)
-val Transparent = Color(0x00000000)
+val Transparent = Color(0x40FFFFFF)
 
 
 val M_PeriodColor = Color(0xFFB2DFDB)

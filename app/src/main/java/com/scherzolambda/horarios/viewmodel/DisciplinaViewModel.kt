@@ -15,6 +15,7 @@ import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.Identificacao
 import com.scherzolambda.horarios.data_transformation.api.models.bodies.RegisterBody
 import com.scherzolambda.horarios.data_transformation.api.repositories.AuthRepository
+import com.scherzolambda.horarios.data_transformation.getTodayClasses2
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.data_transformation.montarHorariosSemanaisDeDisciplinas
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,16 @@ class DisciplinaViewModel @Inject constructor(
 
     val weeklySchedule: StateFlow<List<HorarioSemanal>> = _disciplinas
         .map { disciplinas -> montarHorariosSemanaisDeDisciplinas(disciplinas) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val todaysSchedule: StateFlow<List<HorarioSemanal>> = weeklySchedule
+        .map { schedule ->
+            getTodayClasses2(schedule)
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -118,20 +129,24 @@ class DisciplinaViewModel @Inject constructor(
             deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
         )
         viewModelScope.launch {
-            val result = repository.saveUserData(userData)
-            result.enqueue(object : Callback<AuthResponse> {
-                override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
-                    if (response.isSuccessful) {
-                        Log.i("disciplinaVM", "User data saved successfully")
-                    } else {
-                        Log.e("DisciplinaVM", "Failed to save user data: ${response.errorBody()?.string()}")
+            try {
+                val result = repository.saveUserData(userData)
+                result.enqueue(object : Callback<AuthResponse> {
+                    override fun onResponse(call: Call<AuthResponse>, response: Response<AuthResponse>) {
+                        if (response.isSuccessful) {
+                            Log.i("disciplinaVM", "User data saved successfully")
+                        } else {
+                            Log.e("DisciplinaVM", "Failed to save user data: ${response.errorBody()?.string()}")
+                        }
                     }
-                }
 
-                override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
-                    Log.e("DisciplinaVM", "Error saving user data ${t.message}", t)
-                }
-            })
+                    override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
+                        Log.e("DisciplinaVM", "Error saving user data ${t.message}", t)
+                    }
+                })
+            }catch (e: Exception) {
+                Log.e("DisciplinaVM", "Exception saving user data: ${e.message}", e)
+            }
         }
     }
 
@@ -147,11 +162,16 @@ class DisciplinaViewModel @Inject constructor(
             deviceName = "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}"
         )
         viewModelScope.launch {
-            val result = repository.updateUserData(userData)
-            if(result.isSuccessful) {
-                Log.i("disciplinaVM", "User data Updated successfully")
-            } else {
-                Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+            try {
+
+                val result = repository.updateUserData(userData)
+                if(result.isSuccessful) {
+                    Log.i("disciplinaVM", "User data Updated successfully")
+                } else {
+                    Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+                }
+            }catch (e: Exception) {
+                Log.e("DisciplinaVM", "Exception updating user data: ${e.message}", e)
             }
         }
     }

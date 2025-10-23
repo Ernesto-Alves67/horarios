@@ -36,12 +36,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
+import com.scherzolambda.horarios.viewmodel.ConfigViewModel
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.M_PeriodColor
@@ -53,12 +55,14 @@ import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 @Composable
 fun WeeklyScreen(
-    disciplinaViewModel: DisciplinaViewModel
+    horarios: List<HorarioSemanal>,
+    isLoading: Boolean,
+    isShowEmptyCells: Boolean,
 ) {
-    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
-    val isLoading by disciplinaViewModel.isLoading.collectAsState()
-    val context = LocalContext.current
-
+//    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
+//    val isLoading by disciplinaViewModel.isLoading.collectAsState()
+//
+//    val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
     Column(
         verticalArrangement = Arrangement.Top,
         modifier = Modifier
@@ -74,7 +78,7 @@ fun WeeklyScreen(
                 CircularProgressIndicator()
             }
         } else {
-            WeeklySchedule(horarios)
+            WeeklySchedule(horarios, isShowEmptyCells)
         }
     }
 }
@@ -82,7 +86,8 @@ fun WeeklyScreen(
 
 @Composable
 fun WeeklySchedule(
-    horarios: List<HorarioSemanal>
+    horarios: List<HorarioSemanal>,
+    showEmptyCells: Boolean
 ) {
     val diasUteis = DaysOfWeekMap.days.filterKeys { it in 2..6 }
     val periodos = listOf(HourType.M, HourType.T)
@@ -136,7 +141,25 @@ fun WeeklySchedule(
                 items(gridItems.size, key = { index -> index }) { index ->
                     val (text, color, celula) = gridItems[index]
                     if (text.equals("-----")) {
-                        // Célula vazia, não renderiza nada
+                        if(showEmptyCells){
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .fillMaxWidth()
+                                    .background(color, shape = RoundedCornerShape(4.dp))
+                                    .padding(2.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = text,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = UfcatBlack,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 3
+                                )
+                            }
+                        }
                     } else {
                         Box(
                             modifier = Modifier

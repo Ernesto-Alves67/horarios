@@ -16,6 +16,9 @@ object DataStoreHelper {
     private val FILE_LOADED_KEY = booleanPreferencesKey("is_file_loaded")
     private val FISRT_ACCESS_KEY = booleanPreferencesKey("if_first_access")
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("acess_token")
+    private val THEME_KEY = stringPreferencesKey("theme")
+    private val WEEK_UI_KRY = booleanPreferencesKey("show_empty_weekly_cell")
+    private val DAY_UI_KEY = booleanPreferencesKey("show_empty_daily_cell")
 
     // Função para inicializar o DataStore
     fun initialize(dataStore: DataStore<Preferences>) {
@@ -49,5 +52,28 @@ object DataStoreHelper {
         dataStore.edit { prefs ->
             prefs[FISRT_ACCESS_KEY] = value}
     }
-}
 
+    fun getThemeFlow(): Flow<String?> =
+        dataStore.data.map { it[THEME_KEY] }
+
+    suspend fun setTheme(value: String) {
+        dataStore.edit { prefs ->
+            prefs[THEME_KEY] = value
+        }
+    }
+
+    fun getShowEmptyWeeklyCellFlow(): Flow<Boolean> =
+        dataStore.data.map { it[WEEK_UI_KRY] ?: false }
+
+    suspend fun setShowEmptyWeeklyCell(value: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[WEEK_UI_KRY] = value
+        }
+    }
+    fun getShowEmptyDailyCellFlow(): Flow<Boolean> =
+        dataStore.data.map { it[DAY_UI_KEY] ?: false }
+    suspend fun setShowEmptyDailyCell(value: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[DAY_UI_KEY] = value}
+    }
+}

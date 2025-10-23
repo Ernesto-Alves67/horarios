@@ -2,7 +2,6 @@ package com.scherzolambda.horarios.ui.screens.web
 
 import android.annotation.SuppressLint
 import android.net.http.SslError
-import android.util.Log
 import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
 import android.webkit.WebView
@@ -11,16 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 
 @SuppressLint("SetJavaScriptEnabled")
@@ -53,9 +49,9 @@ fun SigaaWebView(
                     }
                     setLayerType(WebView.LAYER_TYPE_HARDWARE, null)
                     webViewClient = object : WebViewClient() {
+                        @SuppressLint("WebViewClientOnReceivedSslError")
                         override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
-                            Log.e("SigaaWebView", "SSL Error: ${error?.primaryError}, URL: ${view?.url}, Error: $error")
-                            handler?.proceed() // TODO: Avaliar se deve perguntar ao usuário antes de prosseguir
+                            handler?.proceed()
                         }
 
                         override fun onPageFinished(view: WebView?, url: String?) {
@@ -85,8 +81,7 @@ fun SigaaWebView(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SigaaWebScreen(
-    webViewRef: (WebView?) -> Unit,
-
+    webViewRef: (WebView?) -> Unit
 ) {
     SigaaWebView(
         modifier = Modifier.fillMaxSize(),
