@@ -43,7 +43,7 @@ import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
-import com.scherzolambda.horarios.ui.screens.config.ConfigViewModel
+import com.scherzolambda.horarios.viewmodel.ConfigViewModel
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.M_PeriodColor

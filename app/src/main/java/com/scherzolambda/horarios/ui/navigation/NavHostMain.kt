@@ -45,7 +45,7 @@ import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
 import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
-import com.scherzolambda.horarios.ui.screens.config.ConfigViewModel
+import com.scherzolambda.horarios.viewmodel.ConfigViewModel
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.description.AppDescriptionScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
