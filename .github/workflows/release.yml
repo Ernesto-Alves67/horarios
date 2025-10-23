@@ -83,6 +83,5 @@ jobs:
             app/build/outputs/apk/release/*.apk
           #            app/build/outputs/bundle/release/*.aab
           overwrite: true
-          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

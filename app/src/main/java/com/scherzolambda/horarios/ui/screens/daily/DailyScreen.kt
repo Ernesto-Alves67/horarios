@@ -46,7 +46,6 @@ import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
 import com.scherzolambda.horarios.ui.screens.week.DialogInfoRow
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
-import com.scherzolambda.horarios.ui.theme.Transparent
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
 import com.scherzolambda.horarios.ui.theme.UfcatRed
 import com.scherzolambda.horarios.ui.utils.compareVersionsSimple
@@ -165,14 +164,6 @@ fun DailyScreen(
                                 .background(glassBrush)
                                 .align(Alignment.CenterHorizontally)
                         )
-//                        Box(
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .padding(16.dp)
-//                                .background(color = Color.Unspecified)
-//
-//                        ) {
-//                        }
                     }
 
                     Column(

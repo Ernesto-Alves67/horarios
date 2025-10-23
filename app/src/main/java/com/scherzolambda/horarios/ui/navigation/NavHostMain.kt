@@ -95,10 +95,9 @@ fun MainNavigation() {
     val snackbarHostState = remember { SnackbarHostState() }
     val downloadService = remember { DownloadService() }
 
-    // Estado elevado para WebView
+
     var sigaaWebView by remember { mutableStateOf<WebView?>(null) }
 
-    // Função de download
     val onDownloadClick = if (currentRoute == Screen.Sigaa.route) {
         {
             downloadService.handleDownload(
@@ -183,7 +182,6 @@ fun TopBar(
         ),
         title = {
             ConstraintLayout {
-                // Create references for the composables
                 val (icon, text) = createRefs()
 
                 // Icon
@@ -244,7 +242,6 @@ fun BottomNavBar(navController: NavHostController, currentRoute: String) {
             key(screen.route) {
                 val selected = index == selectedIndex
                 val icon = painterResource(screen.iconRes)
-//                    val fontWeight by animateIntAsState(targetValue = if (selected) 700 else 400)
 
                 NavigationBarItem(
                     selected = selected,

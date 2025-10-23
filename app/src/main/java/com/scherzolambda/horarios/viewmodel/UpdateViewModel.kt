@@ -1,6 +1,5 @@
 package com.scherzolambda.horarios.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,12 +16,6 @@ class UpdateViewModel @Inject constructor(
     private val api: GitHubService
 ) : ViewModel() {
 
-    var latestVersion by mutableStateOf<String?>(null)
-        private set
-
-    var downloadUrl by mutableStateOf<String?>(null)
-        private set
-
     var updateInfo by mutableStateOf(AppUpdateInfo())
         private set
 
@@ -35,8 +28,8 @@ class UpdateViewModel @Inject constructor(
             try {
                 val release = api.api.getLatestRelease()
                 val currentVersion = "v${BuildConfig.VERSION_NAME}"
-                Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: ${release.tagName}")
-                Log.d("UpdateCheck", "Release details: $release")
+//                Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: ${release.tagName}")
+//                Log.d("UpdateCheck", "Release details: $release")
                 if (release.tagName != currentVersion) {
                     updateInfo.latestVersion = release.tagName
                     updateInfo.downloadUrl = release.assets?.firstOrNull()?.downloadUrl.toString()
