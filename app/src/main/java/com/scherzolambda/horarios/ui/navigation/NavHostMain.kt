@@ -47,6 +47,7 @@ import com.scherzolambda.horarios.data_transformation.download.DownloadService
 import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
 import com.scherzolambda.horarios.ui.screens.config.ConfigViewModel
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
+import com.scherzolambda.horarios.ui.screens.description.AppDescriptionScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
@@ -73,6 +74,7 @@ sealed class Screen(val route: String, val label: String, val iconRes: Int) {
 
 sealed class OuterScreen(val route: String) {
     object Config : OuterScreen("config")
+    object AppDescription : OuterScreen("app_description")
 }
 
 val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
@@ -125,9 +127,16 @@ fun MainNavigation() {
         ConfigScreen(
             onBack = { navController.popBackStack() },
             themeViewModel = themeViewModel,
-            configViewModel = configViewModel
+            configViewModel = configViewModel,
+            onNavigateToDescription = { navController.navigate(OuterScreen.AppDescription.route) }
         )
 
+        return
+    }
+    if (currentRoute == OuterScreen.AppDescription.route) {
+        AppDescriptionScreen(
+            onBack = { navController.popBackStack() }
+        )
         return
     }
     Scaffold(
@@ -324,7 +333,13 @@ fun AppNavHost(
             ConfigScreen(
                 themeViewModel = themeViewModel,
                 onBack = { navController.popBackStack() },
-                configViewModel = configViewModel
+                configViewModel = configViewModel,
+                onNavigateToDescription = { navController.navigate(OuterScreen.AppDescription.route)}
+            )
+        }
+        composable(OuterScreen.AppDescription.route) {
+            AppDescriptionScreen(
+                onBack = { navController.popBackStack() }
             )
         }
     }

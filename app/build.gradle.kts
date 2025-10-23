@@ -113,4 +113,11 @@ dependencies {
     //    Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // RichText UI (Componente principal)
+    implementation("com.halilibo.compose-richtext:richtext-ui:0.20.0")
+
+    // Módulo CommonMark (para renderizar Markdown)
+    implementation("com.halilibo.compose-richtext:richtext-commonmark:0.20.0")
+
 }

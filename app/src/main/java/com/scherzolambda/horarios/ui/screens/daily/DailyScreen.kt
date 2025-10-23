@@ -108,6 +108,12 @@ fun DailyScreen(
                     textAlign = TextAlign.Center,
                     color = LocalAppColors.current.content.blackText
                 )
+                Text(
+                    "Na aba 'SIGAA' entre com seus dados e baixe o comprovante de matrículas",
+                    modifier = Modifier.padding(8.dp),
+                    textAlign = TextAlign.Center,
+                    color = LocalAppColors.current.content.blackText
+                )
             }
         } else {
 

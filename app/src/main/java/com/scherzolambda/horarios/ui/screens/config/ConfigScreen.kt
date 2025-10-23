@@ -2,6 +2,7 @@ package com.scherzolambda.horarios.ui.screens.config
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,8 @@ import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 fun ConfigScreen(
     onBack: () -> Unit,
     themeViewModel: ThemeViewModel,
-    configViewModel: ConfigViewModel
+    configViewModel: ConfigViewModel,
+    onNavigateToDescription: () -> Unit
 ) {
     val themeState by themeViewModel.theme.collectAsState()
 
@@ -115,14 +117,15 @@ fun ConfigScreen(
             // --- SOBRE ---
             SecaoTitulo("SOBRE")
 
-            ItemConfiguracao( "Política de Privacidade")
-            ItemConfiguracao( "Contrato de Usuário")
+            ItemConfiguracao( "O que é o Horários?",
+                onClick = onNavigateToDescription)
+//            ItemConfiguracao( "Contrato de Usuário")
             ItemConfiguracao( titulo="Versão",
                 descricao = BuildConfig.VERSION_NAME)
 
-            // --- SUPORTE ---
-            SecaoTitulo("SUPORTE")
-            ItemConfiguracao( "Relatar problemas e sugestões")
+//            // --- SUPORTE ---
+//            SecaoTitulo("SUPORTE")
+//            ItemConfiguracao( "Relatar problemas e sugestões")
 
         }
     }
@@ -190,13 +193,18 @@ fun SecaoTitulo(texto: String) {
 }
 
 @Composable
-fun ItemConfiguracao(titulo: String, descricao: String? = null) {
+fun ItemConfiguracao(
+    titulo: String,
+    descricao: String? = null,
+    onClick: (() -> Unit)?= null) {
     val modifier = remember { Modifier
         .fillMaxWidth()
         .padding(horizontal = 16.dp, vertical = 8.dp) }
 
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable{
+            onClick?.invoke()
+        },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = LocalAppColors.current.content.whiteText)
