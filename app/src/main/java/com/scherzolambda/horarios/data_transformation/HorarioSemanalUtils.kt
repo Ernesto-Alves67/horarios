@@ -4,7 +4,6 @@ import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import java.time.LocalDate
 
-
 /** Modelo de dados para representar uma disciplina
  * @param componenteCurricular Nome ou código da disciplina
  * @param horario Código(s) do horário associado a essa disciplina (pode ser uma String ou uma lista de Strings)

@@ -96,6 +96,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.7")
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
+    // coroutines test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
