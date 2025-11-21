@@ -1,10 +1,10 @@
 <network-security-config>
-    <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">sigaa.sistemas.ufcat.edu.br</domain>
+
+    <domain-config cleartextTrafficPermitted="true" ignoresPinningErrors="false">
+        <domain includeSubdomains="true">sistemas.ufcat.edu.br</domain>
         <trust-anchors>
-            <certificates src="system" />
-            <certificates src="user" />
-            <certificates src="@raw/rnp_ca" />
+            <certificates src="@raw/globalsign_rsa_ov_ssl_ca_2018" />
         </trust-anchors>
     </domain-config>
+
 </network-security-config>
