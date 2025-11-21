@@ -44,6 +44,7 @@ import androidx.navigation.compose.rememberNavController
 import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
+import com.scherzolambda.horarios.ui.screens.LiquidScreen
 import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
 import com.scherzolambda.horarios.viewmodel.ConfigViewModel
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
@@ -320,7 +321,10 @@ fun AppNavHost(
                 isLoading = isLoading,
                 isShowEmptyCells = isShowEmptyCells)
         }
-        composable(Screen.Status.route) { StatusScreen(disciplinaViewModel) }
+        composable(Screen.Status.route) {
+            LiquidScreen()
+//            StatusScreen(disciplinaViewModel)
+        }
         composable(Screen.Sigaa.route) {
             SigaaWebScreen(
                 webViewRef = sigaaWebViewRef,

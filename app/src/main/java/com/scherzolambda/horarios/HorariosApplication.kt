@@ -8,14 +8,14 @@ import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.EnvConfig
 import dagger.hilt.android.HiltAndroidApp
 
+private val Context.dataStore by preferencesDataStore(name = "app_preferences")
+
 @HiltAndroidApp
 class HorariosApplication : Application() {
-    private val Context.dataStore by preferencesDataStore(name = "app_preferences")
-
     override fun onCreate() {
         super.onCreate()
         // Inicializa o DataStoreHelper com o DataStore antes de qualquer requisição
         EnvConfig.load(this)
-        DataStoreHelper.initialize(this.dataStore)
+        DataStoreHelper.initialize(applicationContext.dataStore)
     }
 }
