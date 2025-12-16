@@ -1,7 +1,9 @@
 # Gradle files
 .gradle/
 build/
-
+release/
+*.base64
+*.properties
 # Local configuration file (sdk path, etc)
 local.properties
 
