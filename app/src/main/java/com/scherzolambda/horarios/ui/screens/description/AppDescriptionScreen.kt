@@ -1,6 +1,7 @@
 package com.scherzolambda.horarios.ui.screens.description
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,22 +22,22 @@ fun AppDescriptionScreen(
     onBack: () -> Unit
 ) {
 
-    val policyText = """
-
+    val descriptionText = """
         ## O que é?
+        ---
         - Decodificador de codigos de horários das aulas.
-        - Cansado de descriptografar seus horários? Eu também!! O Horários foi criado para facilitar o acompanhamento e vizualização de aulas. O objetivo é transformar a visualização da grade de horária em uma experiência rápida, fácil e sem complicação.
-        
+        - **Cansado(a) de descriptografar seus horários? Eu também!!** O Horários foi criado para facilitar o acompanhamento e vizualização de aulas. O objetivo é transformar a visualização da grade de horária em uma experiência rápida, fácil e sem complicação.
+        - Desenvolvido com o que há de mais moderno no Android, este app tem como funcionalidade principal, traduzir os códigos de horários das disciplinas e exibi-los de forma eficiente e de fácil entendimento. 
         ## O que ele faz exatamente:
-        
-        - Desenvolvido com o que há de mais moderno no Android o aplicativo tem como funcionalidade principal, traduzir os códigos de horários das disciplinas e exibi-los de forma eficiente e de fácil entendimento. 
+        ---
+        - Vizualização diária e semanal dos horários com base no comprovante de matricula do estudante
         - As células em `Hoje` e `Semana` são clicaveis e mostram os detalhes da aula senddo eles: Local, Hora, Nome do Professor.
         
-        
         ## Código
-        - O código é aberto (Open Source) e todos os releases (APKs) podem ser encontrados diretamente no GitHub. Sinta-se à vontade para conferir o código, reportar problemas ou sugerir melhorias!
+        ---
+        - O código é aberto e todos os releases (APKs) podem ser encontrados diretamente no GitHub. Sinta-se à vontade para conferir o código, reportar problemas ou sugerir melhorias!
         
-        Código Fonte: https://github.com/Ernesto-Alves67/horarios
+        Código Fonte: **https://github.com/Ernesto-Alves67/horarios**
 
 
     """.trimIndent()
@@ -67,9 +68,8 @@ fun AppDescriptionScreen(
                 BasicRichText(
                     modifier = Modifier.padding(innerPadding)
                 ) {
-                    Markdown(content = policyText)
+                    Markdown(content = descriptionText)
                 }
-
             }
 
         }

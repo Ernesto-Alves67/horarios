@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 val White = Color(0xFFFFFFFF)
 val UfcatBlack = Color(0xFF000000)
 val UfcatBlack2 = Color(0xFF0B2408)
+val UfcatBlack3 = Color(0xFF444444)
 
 
 val UfcatOrange = Color(0xFFFD841A)
@@ -39,6 +40,7 @@ data class ContentColors(
     val grayElements: Color = UfcatGray,
     val background: Color = White,
     val white: Color = White,
+    val blackSecondary: Color = UfcatBlack3,
 //    val transparent: Color = Transparent,
 //    val textPrimary: Color,
 //    val textSecondary: Color,

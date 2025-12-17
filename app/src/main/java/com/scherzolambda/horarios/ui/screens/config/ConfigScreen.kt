@@ -126,7 +126,9 @@ fun ConfigScreen(
 
             ItemConfiguracao( "O que é o Horários?",
                 onClick = onNavigateToDescription)
-//            ItemConfiguracao( "Contrato de Usuário")
+
+            ItemConfiguracao("Política de Privacidade",
+                onClick = onNavigateToPrivacyPolicy)
             ItemConfiguracao( titulo="Versão",
                 descricao = BuildConfig.VERSION_NAME)
 
@@ -233,13 +235,14 @@ fun ItemConfiguracao(
             Column {
                 Text(
                     text = titulo,
-                    color = LocalAppColors.current.content.blackText
+                    color = LocalAppColors.current.content.blackText,
+                    fontWeight = FontWeight.Medium
                 )
                 descricao?.let {
                     Text(
                         text = it,
                         color = Color.Gray,
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

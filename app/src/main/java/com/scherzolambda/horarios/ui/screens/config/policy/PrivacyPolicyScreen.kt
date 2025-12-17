@@ -24,18 +24,23 @@ fun PrivacyPolicyScreen(
     // 1. Carrega o texto do recurso raw (necessita da função loadRawResource acima)
 
     val policyText = """
-        Coloque aqui o texto da sua política de privacidade em Markdown.
-        Você pode usar **negrito**, _itálico_, listas, links, etc.
+        ## Política de Privacidade
+        ---
+        O Horários valoriza sua privacidade. Esta política explica como coletamos, usamos e protegemos suas informações.
+        Os dados coletados são utilizados exclusivamente para melhorar sua experiência no aplicativo.
+        A seguir os dados que coletamos:
         
-        ## Exemplo de Seção
+        - **Dados Pessoais**: Nome, email, etc.
+        - **Dados de Dispositivo**: Tipo de dispositivo, sistema operacional.
+        - **Dados de Uso**: Informações sobre como você utiliza o aplicativo.
+        - **Cookies**: Pequenos arquivos armazenados no seu dispositivo.
         
-        Este é um exemplo de seção na política de privacidade.
+        ## Seus Direitos
+        Você tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento.
         
-        - Item 1
-        - Item 2
-        - Item 3
-        
-        [Link para mais informações](https://www.exemplo.com)
+        Entre em contato conosco para exercer esses direitos.
+        - [Email](mailto:ernesto487dev@gmail.com)
+        - [whatsapp](https://wa.me/64999684391)
     """.trimIndent()
     val textColor = LocalAppColors.current.content.blackText
     BackHandler {
@@ -49,7 +54,6 @@ fun PrivacyPolicyScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(LocalAppColors.current.content.background)
                 .verticalScroll(rememberScrollState())
                 .padding(all = 20.dp)
         ) {
