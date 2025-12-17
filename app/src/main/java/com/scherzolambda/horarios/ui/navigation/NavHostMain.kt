@@ -30,6 +30,7 @@ import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
 import com.scherzolambda.horarios.ui.screens.config.policy.PrivacyPolicyScreen
 import com.scherzolambda.horarios.ui.screens.config.usercontract.UserAgreementScreen
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
+import com.scherzolambda.horarios.ui.screens.description.AppDescriptionScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
@@ -54,6 +55,7 @@ sealed class Screen(val route: String, val label: String, val iconRes: Int) {
 
 sealed class OuterScreen(val route: String) {
     object Config : OuterScreen("config")
+    object AppDescription : OuterScreen("app_description")
     object PrivacyPolicy : OuterScreen("privacy_policy")
     object UserContract : OuterScreen("user_contract")
 }
@@ -179,6 +181,7 @@ fun AppNavHost(
                     StatusScreen(disciplinaViewModel, innerPadding)
                 }
             ) }
+
         composable(Screen.Sigaa.route) {
             MainContainer(
                 snackbarHostState = snackbarHostState,
@@ -187,6 +190,7 @@ fun AppNavHost(
                 onDownloadClick = onDownloadClick,
                 content = { innerPadding ->
                     SigaaWebScreen(
+                        paddingValues = innerPadding,
                         webViewRef = sigaaWebViewRef,
                     )
                 }
@@ -194,19 +198,8 @@ fun AppNavHost(
 
         }
 
-        composable(OuterScreen.Config.route,
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { it }) + fadeIn()
-            },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
-            },
-            popEnterTransition = {
-                slideInHorizontally(initialOffsetX = { -it }) + fadeIn()
-            },
-            popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-            }) {
+        composable(OuterScreen.Config.route)
+        {
             ConfigScreen(
                 themeViewModel = themeViewModel,
                 onBack = { navController.popBackStack() },
@@ -216,44 +209,24 @@ fun AppNavHost(
                 },
                 onNavigateToUserContract = {
                     navController.navigate(OuterScreen.UserContract.route)
-                }
+                },
+                onNavigateToDescription = { navController.navigate(OuterScreen.AppDescription.route)}
             )
         }
-
-        composable(OuterScreen.PrivacyPolicy.route,
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { it }) + fadeIn()
-            },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
-            },
-            popEnterTransition = {
-                slideInHorizontally(initialOffsetX = { -it }) + fadeIn()
-            },
-            popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-            }){
+        composable(OuterScreen.AppDescription.route) {
+            AppDescriptionScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(OuterScreen.PrivacyPolicy.route){
             PrivacyPolicyScreen(
                 onBack = { navController.popBackStack() }
             )
         }
-        composable(OuterScreen.UserContract.route,
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { it }) + fadeIn()
-            },
-            exitTransition = {
-                slideOutHorizontally(targetOffsetX = { -it }) + fadeOut()
-            },
-            popEnterTransition = {
-                slideInHorizontally(initialOffsetX = { -it }) + fadeIn()
-            },
-            popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-            }){
+        composable(OuterScreen.UserContract.route,){
             UserAgreementScreen(
                 onBack = { navController.popBackStack() }
             )
         }
     }
 }
-

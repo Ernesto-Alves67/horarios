@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
+import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
+import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.components.WeeklySchedule
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 

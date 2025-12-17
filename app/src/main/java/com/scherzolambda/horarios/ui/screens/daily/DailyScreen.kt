@@ -45,6 +45,7 @@ import com.scherzolambda.horarios.ui.screens.daily.components.HoursOfDayComponen
 import com.scherzolambda.horarios.ui.screens.daily.components.InfoCollumn
 import com.scherzolambda.horarios.ui.screens.daily.components.existeDisciplinaNoTurno
 import com.scherzolambda.horarios.ui.screens.updater.UpdateDialog
+
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.UfcatOrangeDark
@@ -69,7 +70,15 @@ fun DailyScreen(
     var latestVersion by remember { mutableStateOf<String?>(updateInfo.latestVersion) }
     var downloadUrl by remember { mutableStateOf<String?>(updateInfo.downloadUrl) }
     var showDialog by remember { mutableStateOf(false) }
+    val glassBrush = Brush.horizontalGradient(
+        colors = listOf(
+            UfcatRed,
+            Color(0xFFFF3366), // tom rosa-avermelhado
+            Color(0xFFFF6600),  // tom laranja
+            UfcatOrangeDark
+        )
 
+    )
     LaunchedEffect(latestVersion, downloadUrl) {
         if( latestVersion != null) {
             val currentVersion = BuildConfig.VERSION_NAME
@@ -83,7 +92,7 @@ fun DailyScreen(
     }
     var selectedCell by remember { mutableStateOf<HorarioSemanal?>(null) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -91,7 +100,8 @@ fun DailyScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else if (disciplinasHoje.isEmpty()) {
+        }
+        if (disciplinasHoje.isEmpty()) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -108,33 +118,24 @@ fun DailyScreen(
                     textAlign = TextAlign.Center,
                     color = LocalAppColors.current.content.blackText
                 )
+                Text(
+                    "Na aba 'SIGAA' entre com seus dados e baixe o comprovante de matrículas",
+                    modifier = Modifier.padding(8.dp),
+                    textAlign = TextAlign.Center,
+                    color = LocalAppColors.current.content.blackText
+                )
             }
         } else {
 
-//            when(disciplinasHoje.isEmpty()){
-//                true -> {
-//                    InfoCollumn(
-//                        title = "Nenhuma aula hoje",
-//                        info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(16.dp)
-//                    )
-//                }
-//                false -> {
-//
-//                }
-//
-//            }
-            val glassBrush = Brush.horizontalGradient(
-                colors = listOf(
-                    UfcatRed,
-                    Color(0xFFFF3366), // tom rosa-avermelhado
-                    Color(0xFFFF6600),  // tom laranja
-                    UfcatOrangeDark
-                )
+//            InfoCollumn(
+//                title = "Nenhuma aula hoje",
+//                info = "Você não tem aulas agendadas para hoje. Aproveite o dia!",
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp)
+//            )
 
-            )
+
             // Header fixo no topo
             Card(
                 modifier = Modifier.padding(16.dp)
@@ -153,10 +154,10 @@ fun DailyScreen(
                 elevation = CardDefaults.cardElevation(8.dp),){
 
                 Text(
-                    text = "Aulas de Hoje",
+                    text = " »·•• Aulas de Hoje ••·«",
                     fontSize = 32.sp,
                     fontWeight = Bold,
-                    color = LocalAppColors.current.content.white,
+                    color = LocalAppColors.current.content.blackText,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -169,7 +170,7 @@ fun DailyScreen(
                 modifier = Modifier
                     .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .padding(paddingValues),
+                    .padding(4.dp),
                 verticalArrangement = Arrangement.Top
             ) {
                 if (existeDisciplinaNoTurno(disciplinasHoje, HourType.M)) {
@@ -184,6 +185,9 @@ fun DailyScreen(
 
                 Spacer(modifier = Modifier.padding(8.dp))
             }
+        }
+
+
 
         }
 
@@ -237,7 +241,8 @@ fun DailyScreen(
             )
         }
     }
-}
+
+
 
 @Preview
 @Composable

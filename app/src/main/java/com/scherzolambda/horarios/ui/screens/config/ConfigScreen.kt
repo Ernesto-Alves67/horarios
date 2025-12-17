@@ -47,8 +47,8 @@ import com.scherzolambda.horarios.R
 import com.scherzolambda.horarios.ui.theme.AppTheme
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
-import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 import androidx.core.net.toUri
+import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 
 
 @Composable
@@ -57,7 +57,8 @@ fun ConfigScreen(
     themeViewModel: ThemeViewModel,
     configViewModel: ConfigViewModel,
     onNavigateToPrivacyPolicy: () -> Unit,
-    onNavigateToUserContract: () -> Unit
+    onNavigateToUserContract: () -> Unit,
+    onNavigateToDescription: () -> Unit
 ) {
     val themeState by themeViewModel.theme.collectAsState()
 
@@ -123,13 +124,9 @@ fun ConfigScreen(
             // --- SOBRE ---
             SecaoTitulo("SOBRE")
 
-            ItemConfiguracao(
-                titulo = "Política de Privacidade",
-                onClick = onNavigateToPrivacyPolicy)
-            ItemConfiguracao(
-                titulo="Contrato de Usuário",
-                onClick = onNavigateToUserContract
-                )
+            ItemConfiguracao( "O que é o Horários?",
+                onClick = onNavigateToDescription)
+//            ItemConfiguracao( "Contrato de Usuário")
             ItemConfiguracao( titulo="Versão",
                 descricao = BuildConfig.VERSION_NAME)
 
