@@ -52,7 +52,6 @@ fun HoursOfDayComponent(
             containerColor = LocalAppColors.current.content.whiteText
         )
     ) {
-        // determine background color for this turno (same as WeeklyScreen)
         val (periodoColor, turnoLabel) = when (hourType) {
             HourType.M -> M_PeriodColor to "Turno Manhã"
             HourType.T -> T_PeriodColor to "Turno Tarde"
@@ -63,12 +62,10 @@ fun HoursOfDayComponent(
             color = LocalAppColors.current.content.blackText,
             fontWeight = Bold, fontSize = 20.sp)
 
-
-        // Espaçamento entre blocos de horário
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             hourMap.forEach { (index, hour) ->
                 val disciplinasNoHorario = disciplinasPorHora[index].orEmpty()
-                Log.d("DailyScreen", "HourType: $hourType, HourIndex: $index, Disciplinas: $disciplinasNoHorario")
+//                Log.d("DailyScreen", "HourType: $hourType, HourIndex: $index, Disciplinas: $disciplinasNoHorario")
                 if(disciplinasNoHorario.isEmpty()){
                     if (isShowEmpty){
                         Column(
@@ -97,7 +94,7 @@ fun HoursOfDayComponent(
                             )
                         }
                     }
-                    Log.d("DailyScreen", "Exibindo horário vazio para HourType: $hourType, HourIndex: $index")
+//                    Log.d("DailyScreen", "Exibindo horário vazio para HourType: $hourType, HourIndex: $index")
                 }else{
 
                     Column(
