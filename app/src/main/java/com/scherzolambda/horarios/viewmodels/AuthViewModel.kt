@@ -18,6 +18,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     val repository = AuthRepository()
 
     init {
+//        _isSplashVisible.value = false
         initializeApp()
     }
     //TODO: Analisar desempenho do app quando sem acesso a internet na inicialização
@@ -30,14 +31,15 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                     result.body()?.let {
                         setAccessToken(it.accessToken)
                     }
-                    _isSplashVisible.value = false // Aqui esconde a splash screen
+//                    _isSplashVisible.value = false // Aqui esconde a splash screen
+                    Log.d("AuthViewModel", "Session initialized successfully")
                 } else {
                     Log.e("AuthViewModel", "Failed to initialize session: ${result.errorBody()?.string()}")
-                    _isSplashVisible.value = false // Mesmo em caso de falha, esconde a splash
+//                    _isSplashVisible.value = false // Mesmo em caso de falha, esconde a splash
                 }
             }catch (e: Exception) {
                 Log.e("AuthViewModel", "Exception during session initialization", e)
-                _isSplashVisible.value = false // Mesmo em caso de exceção, esconde a splash
+//                _isSplashVisible.value = false // Mesmo em caso de exceção, esconde a splash
             }
 
         }
@@ -45,6 +47,10 @@ class AuthViewModel @Inject constructor() : ViewModel() {
 
     private suspend fun setAccessToken(token: String) {
         DataStoreHelper.setAccessToken(token)
+    }
+
+    fun hideSplashScreen() {
+        _isSplashVisible.value = false
     }
 
 }

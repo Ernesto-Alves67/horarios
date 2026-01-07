@@ -31,10 +31,12 @@ import com.scherzolambda.horarios.ui.screens.config.policy.PrivacyPolicyScreen
 import com.scherzolambda.horarios.ui.screens.config.usercontract.UserAgreementScreen
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.description.AppDescriptionScreen
+import com.scherzolambda.horarios.ui.screens.splash.ComposeSplashScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
+import com.scherzolambda.horarios.viewmodels.AuthViewModel
 import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 import com.scherzolambda.horarios.viewmodels.DisciplinaViewModel
 import com.scherzolambda.horarios.viewmodels.UpdateViewModel
@@ -65,7 +67,9 @@ val screens = listOf(Screen.Daily, Screen.Weekly, Screen.Status, Screen.Sigaa)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainNavigation() {
+fun MainNavigation(
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
     val navController = rememberNavController()
     val disciplinaViewModel: DisciplinaViewModel = hiltViewModel()
     val updateViewModel: UpdateViewModel = hiltViewModel()
@@ -104,7 +108,15 @@ fun MainNavigation() {
             )
         }
     } else null
+    val isSplashVisible by authViewModel.isSplashVisible
 
+//    if (isSplashVisible) {
+//        ComposeSplashScreen(
+//            onFinished = { authViewModel.hideSplashScreen() }
+//        )
+//    }else {
+//
+//    }
     AppNavHost(
         navController = navController,
         disciplinaViewModel = disciplinaViewModel,

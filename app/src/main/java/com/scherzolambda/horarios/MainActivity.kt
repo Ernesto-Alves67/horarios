@@ -5,41 +5,36 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.collectAsState
-import com.scherzolambda.horarios.ui.navigation.MainNavigation
-import com.scherzolambda.horarios.ui.theme.ApplicationTheme
-import com.scherzolambda.horarios.ui.theme.ThemeViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowInsetsControllerCompat
-import com.scherzolambda.horarios.viewmodels.AuthViewModel
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowInsetsControllerCompat
+import com.scherzolambda.horarios.ui.navigation.MainNavigation
 import com.scherzolambda.horarios.ui.theme.AppTheme
+import com.scherzolambda.horarios.ui.theme.ApplicationTheme
+import com.scherzolambda.horarios.ui.theme.ThemeViewModel
+import com.scherzolambda.horarios.viewmodels.AuthViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+//@SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val authViewModel: AuthViewModel by viewModels()
     private val themeViewModel: ThemeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Instala o SplashScreen e controla a visibilidade.
-        installSplashScreen().apply {
-            setKeepOnScreenCondition { authViewModel.isSplashVisible.value }
-        }
-
+        installSplashScreen()
         enableEdgeToEdge()
 
         // Configuração da interface do usuário com o tema atual
         setContent {
             val appTheme by themeViewModel.theme.collectAsState()
 
-            // Atualiza a aparência da barra de status com base no tema.
             StatusBarAppearanceUpdater(appTheme) { isDark ->
                 updateStatusBarAppearance(isDark)
             }
