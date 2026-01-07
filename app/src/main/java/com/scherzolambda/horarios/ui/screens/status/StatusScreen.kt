@@ -31,10 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.scherzolambda.horarios.data_transformation.Disciplina
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
@@ -47,12 +49,12 @@ import kotlin.io.path.createTempFile
 
 @Composable
 fun StatusScreen(
-    disciplinaViewModel: DisciplinaViewModel,
-    paddingValues: PaddingValues
+    totalDisciplinas: List<Disciplina>,
+    paddingValues: PaddingValues,
+    isLoading: Boolean = false,
+    onLoadFileClick: (String) -> Unit,
+    onClickButton: () -> Unit
 ) {
-    val disciplinasState = disciplinaViewModel.disciplinas.collectAsState()
-    val disciplinas = disciplinasState.value
-    val isLoading by disciplinaViewModel.isLoading.collectAsState()
 
     var htmlUri by remember { mutableStateOf<Uri?>(null) }
     var salvarStatus by remember { mutableStateOf<String?>(null) }
@@ -61,9 +63,7 @@ fun StatusScreen(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> htmlUri = uri }
     )
-//    val isFileLoaded by DataStoreHelper.isFileLoadedFlow(context).collectAsState(initial = false)
 
-    // Quando o arquivo HTML é selecionado, extrai as tabelas e salva automaticamente
     LaunchedEffect(htmlUri) {
         htmlUri?.let { uri ->
             val tempFile = withContext(Dispatchers.IO) {
@@ -75,7 +75,7 @@ fun StatusScreen(
                 outputStream.close()
                 tempFile
             }
-            disciplinaViewModel.carregarDeArquivoHtml(tempFile.absolutePath)
+            onLoadFileClick(tempFile.absolutePath)
             salvarStatus = "Arquivo de disciplinas substituído com sucesso!"
             Toast.makeText(context, salvarStatus, Toast.LENGTH_SHORT).show()
             htmlUri = null // Reset para permitir seleção do mesmo arquivo
@@ -101,7 +101,8 @@ fun StatusScreen(
             ) {
                 CircularProgressIndicator()
             }
-        } else if (disciplinas.isNotEmpty()) {
+        }
+        if (totalDisciplinas.isNotEmpty()) {
             StatusInfoCard(
                 title = "Arquivo carregado",
                 info = "",
@@ -113,6 +114,7 @@ fun StatusScreen(
                         end.linkTo(parent.end)
                     },
                 onClickButton = { launcher.launch(arrayOf("text/html")) })
+
             LazyColumn(
                 modifier = Modifier
                     .constrainAs(lazyListRef) {
@@ -123,8 +125,8 @@ fun StatusScreen(
                     }.padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(disciplinas.size) { index ->
-                    val disciplina = disciplinas[index]
+                items(totalDisciplinas.size) { index ->
+                    val disciplina = totalDisciplinas[index]
                     if (disciplina.codigo.isNotEmpty()) {
                         Card(
                             elevation = CardDefaults.cardElevation(4.dp),
@@ -145,7 +147,7 @@ fun StatusScreen(
                                 )
                             }
                         }
-                        if(index== disciplinas.size-1){
+                        if(index== totalDisciplinas.size-1){
                             Spacer(modifier = Modifier.size(8.dp))
                         }
                     }
@@ -212,4 +214,15 @@ fun StatusInfoCard(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun StatusScreenPreview() {
+    StatusInfoCard(
+        title = "Nenhum arquivo carregado",
+        info = "Por favor, selecione um arquivo HTML.",
+        textButton = "Selecionar arquivo HTML",
+        onClickButton = {}
+    )
 }

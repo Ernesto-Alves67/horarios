@@ -15,6 +15,8 @@ object DataStoreHelper {
 
     private val FILE_LOADED_KEY = booleanPreferencesKey("is_file_loaded")
     private val FISRT_ACCESS_KEY = booleanPreferencesKey("if_first_access")
+
+    private val MAT_ID_KEY = stringPreferencesKey("matricula")
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("acess_token")
     private val THEME_KEY = stringPreferencesKey("theme")
     private val WEEK_UI_KRY = booleanPreferencesKey("show_empty_weekly_cell")
@@ -23,6 +25,15 @@ object DataStoreHelper {
     // Função para inicializar o DataStore
     fun initialize(dataStore: DataStore<Preferences>) {
         this.dataStore = dataStore
+    }
+
+    fun getMatriculaFlow(): Flow<String?> =
+        dataStore.data.map { it[MAT_ID_KEY] }
+
+    suspend fun setMatricula(value: String) {
+        dataStore.edit { prefs ->
+            prefs[MAT_ID_KEY] = value
+        }
     }
 
     fun isFileLoadedFlow(): Flow<Boolean> =

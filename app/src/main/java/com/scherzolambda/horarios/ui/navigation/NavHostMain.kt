@@ -132,6 +132,7 @@ fun AppNavHost(
     val horariosSemanalState by disciplinaViewModel.weeklySchedule.collectAsStateWithLifecycle()
     val disciplinasHoje by disciplinaViewModel.todaysSchedule.collectAsStateWithLifecycle()
     val isLoading by disciplinaViewModel.isLoading.collectAsStateWithLifecycle()
+    val disciplinasTotal by disciplinaViewModel.disciplinas.collectAsStateWithLifecycle()
     val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
     val isShowEmptyDailyCells by configViewModel.showEmptyDailyCell.collectAsStateWithLifecycle()
     val updateInfoData = updateViewModel.updateInfo
@@ -178,7 +179,15 @@ fun AppNavHost(
                 navController = navController,
                 currentRoute = Screen.Status.route,
                 content = { innerPadding ->
-                    StatusScreen(disciplinaViewModel, innerPadding)
+                    StatusScreen(
+                        totalDisciplinas = disciplinasTotal,
+                        paddingValues = innerPadding,
+                        isLoading = isLoading,
+                        onLoadFileClick = { filePath ->
+                            disciplinaViewModel.carregarDeArquivoHtml(filePath)
+                        },
+                        onClickButton = disciplinaViewModel::updateUserTest,
+                    )
                 }
             ) }
 
@@ -203,14 +212,14 @@ fun AppNavHost(
             ConfigScreen(
                 themeViewModel = themeViewModel,
                 onBack = { navController.popBackStack() },
-                configViewModel = configViewModel,
                 onNavigateToPrivacyPolicy = {
                     navController.navigate(OuterScreen.PrivacyPolicy.route)
                 },
-                onNavigateToUserContract = {
-                    navController.navigate(OuterScreen.UserContract.route)
-                },
-                onNavigateToDescription = { navController.navigate(OuterScreen.AppDescription.route)}
+                onNavigateToDescription = { navController.navigate(OuterScreen.AppDescription.route) },
+                onDailyLayoutChange = configViewModel::setShowEmptyDailyCell,
+                onWeeklyLayoutChange = configViewModel::setShowEmptyWeeklyCell,
+                showEmptyDaily = isShowEmptyDailyCells,
+                showEmptyWeekly = isShowEmptyCells
             )
         }
         composable(OuterScreen.AppDescription.route) {
@@ -223,7 +232,7 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() }
             )
         }
-        composable(OuterScreen.UserContract.route,){
+        composable(OuterScreen.UserContract.route){
             UserAgreementScreen(
                 onBack = { navController.popBackStack() }
             )

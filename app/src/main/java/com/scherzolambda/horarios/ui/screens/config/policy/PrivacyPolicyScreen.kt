@@ -35,9 +35,9 @@ fun PrivacyPolicyScreen(
         - **Dados de Uso**: Informações sobre como você utiliza o aplicativo.
         - **Cookies**: Pequenos arquivos armazenados no seu dispositivo.
         
-        ## Seus Direitos
-        Você tem o direito de acessar, corrigir ou excluir seus dados pessoais a qualquer momento.
-        
+        ## Exclusão de Dados
+        Você pode solicitar a exclusão dos seus dados pessoais a qualquer momento.
+     
         Entre em contato conosco para exercer esses direitos.
         - [Email](mailto:ernesto487dev@gmail.com)
         - [whatsapp](https://wa.me/64999684391)
@@ -54,6 +54,7 @@ fun PrivacyPolicyScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(LocalAppColors.current.content.blackSecondary)
                 .verticalScroll(rememberScrollState())
                 .padding(all = 20.dp)
         ) {
@@ -61,7 +62,8 @@ fun PrivacyPolicyScreen(
                 contentColorProvider = { textColor } // passa a cor dinamicamente
             ) {
                 BasicRichText(
-                    modifier = Modifier.padding(innerPadding)
+                    modifier = Modifier.padding(innerPadding),
+
 
                 ){
                     // dentro do RichText scope você chama o Markdown que já usa a content color

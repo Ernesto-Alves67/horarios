@@ -55,19 +55,16 @@ import com.scherzolambda.horarios.viewmodels.ConfigViewModel
 fun ConfigScreen(
     onBack: () -> Unit,
     themeViewModel: ThemeViewModel,
-    configViewModel: ConfigViewModel,
+    showEmptyDaily: Boolean,
+    showEmptyWeekly: Boolean,
     onNavigateToPrivacyPolicy: () -> Unit,
-    onNavigateToUserContract: () -> Unit,
-    onNavigateToDescription: () -> Unit
+    onNavigateToDescription: () -> Unit,
+    onDailyLayoutChange: (Boolean) -> Unit,
+    onWeeklyLayoutChange: (Boolean) -> Unit
 ) {
     val themeState by themeViewModel.theme.collectAsState()
 
-    val showEmptyDaily by configViewModel.showEmptyDailyCell.collectAsState()
-    val showEmptyWeekly by configViewModel.showEmptyWeeklyCell.collectAsState()
-
     val context = LocalContext.current
-    // TODO: SOBRE a aplicação
-    // TODO: Termos de uso e política de privacidade
 
     // TODO: Opção de limpar cache (dados armazenados localmente)
     // TODO: Opção para ativa/desativar abreviação de nomes em Weekly
@@ -109,7 +106,7 @@ fun ConfigScreen(
                     pop()
                 },
                 isChecked = showEmptyDaily,
-                onCheckedChange = configViewModel::setShowEmptyDailyCell
+                onCheckedChange = onDailyLayoutChange
             )
             ItemSwitchLayout(
                 titulo = buildAnnotatedString {
@@ -119,7 +116,7 @@ fun ConfigScreen(
                     pop()
                 },
                 isChecked = showEmptyWeekly,
-                onCheckedChange = configViewModel::setShowEmptyWeeklyCell
+                onCheckedChange = onWeeklyLayoutChange
             )
             // --- SOBRE ---
             SecaoTitulo("SOBRE")

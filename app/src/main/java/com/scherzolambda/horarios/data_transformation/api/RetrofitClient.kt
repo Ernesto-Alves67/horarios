@@ -20,8 +20,14 @@ class RetrofitClient private constructor() {
         private lateinit var retrofit: Retrofit
         private var accessToken: String? = getAccessTokenSync()
         private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        private var baseUrl: String = ""
 
         init {
+            baseUrl = when(EnvConfig.get("APP_ENV")) {
+                "prod" -> EnvConfig.get("BASE_URL")
+                "dev" -> EnvConfig.get("DEV_BASE_URL")
+                else -> EnvConfig.get("BASE_URL")
+            }
             coroutineScope.launch {
                 DataStoreHelper.getAccessTokenFlow().collect { token ->
                     accessToken = token
@@ -48,7 +54,7 @@ class RetrofitClient private constructor() {
 
             if (!::retrofit.isInitialized) {
                 retrofit = Retrofit.Builder()
-                    .baseUrl(EnvConfig.get("BASE_URL"))
+                    .baseUrl(baseUrl)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()

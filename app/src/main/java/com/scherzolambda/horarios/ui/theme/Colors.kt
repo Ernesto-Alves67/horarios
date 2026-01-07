@@ -81,7 +81,8 @@ val DarkAppColors = AppColors(
         whiteText = UfcatGrayDark,
         blackText = White,
         grayElements = UfcatBlack,
-        background = UfcatBlack
+        background = UfcatBlack,
+        blackSecondary = UfcatBlack3
     )
 )
 

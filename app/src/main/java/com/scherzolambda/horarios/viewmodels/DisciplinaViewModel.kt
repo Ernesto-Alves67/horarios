@@ -83,14 +83,18 @@ class DisciplinaViewModel @Inject constructor(
             _disciplinas.value = novas
         }
     }
-
-    fun carregarDeArquivoHtml(filePath: String) {
-//        Log.d("DisciplinaViewModel", "Carregando disciplinas do arquivo: $filePath")
-        val isFistAccess = DataStoreHelper.isFirstAccessFlow().map { it }.stateIn(
-            viewModelScope,
-            SharingStarted.Lazily,
-            true
+    fun updateUserTest(){
+        val id = Identificacao(
+            matricula = "654987",
+            nome = "Teste Usuario",
+            curso = "Engenharia de Software",
+            formacao = "Bacharelado",
+            periodoLetivo = "2023.2"
         )
+        updateUserData(id)
+    }
+    fun carregarDeArquivoHtml(filePath: String) {
+
         viewModelScope.launch {
             _isLoading.value = true
             _disciplinas.value = emptyList()
@@ -117,7 +121,7 @@ class DisciplinaViewModel @Inject constructor(
         }
     }
 
-    fun saveUserData(user: Identificacao?) {
+    private fun saveUserData(user: Identificacao?) {
         val userData = RegisterBody(
             matricula = user?.matricula ?: "",
             nome = user?.nome ?: "",
@@ -151,7 +155,7 @@ class DisciplinaViewModel @Inject constructor(
         }
     }
 
-    fun updateUserData(user: Identificacao?) {
+    private fun updateUserData(user: Identificacao?) {
         val userData = RegisterBody(
             matricula = user?.matricula ?: "",
             nome = user?.nome ?: "",
@@ -165,10 +169,21 @@ class DisciplinaViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val result = repository.updateUserData(userData)
-                if(result.isSuccessful) {
-                    Log.i("disciplinaVM", "User data Updated successfully")
-                } else {
-                    Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+//                if(result.isSuccessful) {
+//                    Log.i("disciplinaVM", "User data Updated successfully")
+//                } else {
+//                    Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+//                }
+                when(result.code()){
+                    200 -> {
+                        Log.i("disciplinaVM", "User data Updated successfully")
+                    }
+                    404 -> {
+                        saveUserData(user)
+                    }
+                    else -> {
+                        Log.e("DisciplinaVM", "Failed to Update user data: ${result.errorBody()?.string()}")
+                    }
                 }
             }catch (e: Exception) {
                 Log.e("DisciplinaVM", "Exception updating user data: ${e.message}", e)
