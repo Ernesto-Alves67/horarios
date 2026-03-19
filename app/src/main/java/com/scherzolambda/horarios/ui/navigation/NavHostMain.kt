@@ -5,6 +5,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -13,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,15 +29,17 @@ import com.scherzolambda.horarios.data_transformation.download.DownloadResult
 import com.scherzolambda.horarios.data_transformation.download.DownloadService
 import com.scherzolambda.horarios.ui.navigation.components.BottomNavBar
 import com.scherzolambda.horarios.ui.navigation.components.MainContainer
+import com.scherzolambda.horarios.ui.navigation.components.MainScreen2
 import com.scherzolambda.horarios.ui.screens.config.ConfigScreen
 import com.scherzolambda.horarios.ui.screens.config.policy.PrivacyPolicyScreen
 import com.scherzolambda.horarios.ui.screens.config.usercontract.UserAgreementScreen
 import com.scherzolambda.horarios.ui.screens.daily.DailyScreen
 import com.scherzolambda.horarios.ui.screens.description.AppDescriptionScreen
-import com.scherzolambda.horarios.ui.screens.splash.ComposeSplashScreen
 import com.scherzolambda.horarios.ui.screens.status.StatusScreen
 import com.scherzolambda.horarios.ui.screens.web.SigaaWebScreen
 import com.scherzolambda.horarios.ui.screens.week.WeeklyScreen
+import com.scherzolambda.horarios.ui.theme.AppColors
+import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import com.scherzolambda.horarios.viewmodels.AuthViewModel
 import com.scherzolambda.horarios.viewmodels.ConfigViewModel
@@ -150,8 +155,22 @@ fun AppNavHost(
     val updateInfoData = updateViewModel.updateInfo
     NavHost(
         navController = navController,
-        startDestination = Screen.Daily.route,
-//        modifier = Modifier.padding(innerPadding)
+        startDestination = "main",
+        modifier = Modifier
+            .fillMaxSize()
+            .background(LocalAppColors.current.content.background),
+        enterTransition = {
+            slideInHorizontally { it } + fadeIn()
+        },
+        exitTransition = {
+            slideOutHorizontally { -it } + fadeOut()
+        },
+        popEnterTransition = {
+            slideInHorizontally { -it } + fadeIn()
+        },
+        popExitTransition = {
+            slideOutHorizontally { it } + fadeOut()
+        }
     ) {
         composable(Screen.Daily.route) {
             MainContainer(
@@ -219,7 +238,28 @@ fun AppNavHost(
 
         }
 
-        composable(OuterScreen.Config.route)
+        composable(
+            route = OuterScreen.Config.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth } // vem da direita
+                ) + fadeIn()
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> -fullWidth } // sai pra esquerda
+                ) + fadeOut()
+            },
+            popEnterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> -fullWidth } // volta da esquerda
+                ) + fadeIn()
+            },
+            popExitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth } // sai pra direita
+                ) + fadeOut()
+            })
         {
             ConfigScreen(
                 themeViewModel = themeViewModel,
@@ -249,5 +289,24 @@ fun AppNavHost(
                 onBack = { navController.popBackStack() }
             )
         }
+
+        // ======== experimental =======
+        composable("main") {
+            MainScreen2(
+                snackbarHostState = snackbarHostState,
+                navController = navController,
+                horariosSemanalState = horariosSemanalState,
+                disciplinasHoje = disciplinasHoje,
+                disciplinasTotal = disciplinasTotal,
+                isLoading = isLoading,
+                isShowEmptyCells = isShowEmptyCells,
+                isShowEmptyDailyCells = isShowEmptyDailyCells,
+                updateInfoData = updateInfoData,
+                onDownloadClick = onDownloadClick,
+                sigaaWebViewRef = sigaaWebViewRef,
+                disciplinaViewModel = disciplinaViewModel
+            )
+        }
+
     }
 }

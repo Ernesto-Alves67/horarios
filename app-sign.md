@@ -9,9 +9,10 @@ A assinatura de aplicativos é um processo essencial para garantir a integridade
     - sera solicitado que você insira informações como nome, organização e localização.
     1.1 **defina uma senha segura para o keystore e para a chave.**
     - - gerando a senha com o comando a seguir:
-   ```bash
+   
+```bash
     openssl rand -base64 32
-   ```
+```
    2. **Configurar o Gradle**: No arquivo `build.gradle`, configure as propriedades de assinatura.
       ```groovy 
         android {

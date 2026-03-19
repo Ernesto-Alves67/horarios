@@ -10,11 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowInsetsControllerCompat
 import com.scherzolambda.horarios.ui.navigation.MainNavigation
+import com.scherzolambda.horarios.ui.theme.AppColors
 import com.scherzolambda.horarios.ui.theme.AppTheme
 import com.scherzolambda.horarios.ui.theme.ApplicationTheme
+import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.ThemeViewModel
 import com.scherzolambda.horarios.viewmodels.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,6 +30,29 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //TODO: Refatorar para usar o SplashScreen API nativa do Android 12+ e criar uma tela de carregamento personalizada para versões anteriores.
+        //TODO: MElhorar tutorial de assinatura do apk
+        //TODO: botões de compartilhamento com qrcode e feedback
+        // TODO: implementar definição de lembretes para uma disciplna específica
+        //TODO: implementar notificações para as disciplinas
+        //TODO: implmentar alarme caso o usuário queira ser lembrado de uma aula específica
+        //TODO: implementar adição e edição manual de disciplinas e dados do usuario
+        //TODO: botao para limpas dados do app
+        //TODO: tutorial de uso semelahnte a versão web
+        //TODO: corrigir background da tela politica de privacidade e permitir copiar texto da tela
+        //TODO: Melhorar configuraçao de layout
+        //TODO: basear tela de configuração no app do reddit mobile
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
+        //TODO:
 
         installSplashScreen()
         enableEdgeToEdge()
@@ -48,9 +74,9 @@ class MainActivity : ComponentActivity() {
 
     private fun updateStatusBarAppearance(isDark: Boolean) {
         val controller = WindowInsetsControllerCompat(window, window.decorView)
-        controller.isAppearanceLightStatusBars = !isDark // Ícones escuros se tema for escuro
+        controller.isAppearanceLightStatusBars = false
         controller.isAppearanceLightNavigationBars = false
-
+        window.statusBarColor = android.graphics.Color.rgb(41,122,125)
         if (!isDark) {
             window.navigationBarColor = 0
         }
