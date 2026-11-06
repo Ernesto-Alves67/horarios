@@ -287,6 +287,7 @@ fun DaysOfWeekHeader(dias: List<String>) {
                         Color(0xFFFF6600)  // tom laranja
                     )
                 ),
+                RoundedCornerShape(8.dp)
             )
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly

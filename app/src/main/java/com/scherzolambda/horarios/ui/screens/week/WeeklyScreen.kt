@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,26 +31,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.scherzolambda.horarios.data_transformation.DataStoreHelper
 import com.scherzolambda.horarios.data_transformation.enums.DaysOfWeekMap
 import com.scherzolambda.horarios.data_transformation.enums.HourMaps
 import com.scherzolambda.horarios.data_transformation.enums.HourType
 import com.scherzolambda.horarios.data_transformation.models.HorarioSemanal
 import com.scherzolambda.horarios.ui.components.DaysOfWeekHeader
-import com.scherzolambda.horarios.viewmodel.ConfigViewModel
 import com.scherzolambda.horarios.ui.theme.AppTypography
 import com.scherzolambda.horarios.ui.theme.LocalAppColors
 import com.scherzolambda.horarios.ui.theme.M_PeriodColor
 import com.scherzolambda.horarios.ui.theme.N_PeriodColor
 import com.scherzolambda.horarios.ui.theme.T_PeriodColor
 import com.scherzolambda.horarios.ui.theme.UfcatBlack
-import com.scherzolambda.horarios.viewmodel.DisciplinaViewModel
 
 
 @Composable
@@ -59,16 +55,15 @@ fun WeeklyScreen(
     isLoading: Boolean,
     isShowEmptyCells: Boolean,
 ) {
-//    val horarios by disciplinaViewModel.weeklySchedule.collectAsState()
-//    val isLoading by disciplinaViewModel.isLoading.collectAsState()
-//
-//    val isShowEmptyCells by configViewModel.showEmptyWeeklyCell.collectAsStateWithLifecycle()
-    Column(
-        verticalArrangement = Arrangement.Top,
+    Box(
         modifier = Modifier
-            .padding(4.dp)
-            .fillMaxHeight()
-            .background(LocalAppColors.current.content.background)
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                LocalAppColors.current.content.transparent,
+                RoundedCornerShape(8.dp)
+            ),
+        contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
             Box(
@@ -90,11 +85,15 @@ fun WeeklySchedule(
     showEmptyCells: Boolean
 ) {
     val diasUteis = DaysOfWeekMap.days.filterKeys { it in 2..6 }
-    val periodos = listOf(HourType.M, HourType.T)
+    val periodos = listOf(HourType.M, HourType.T, HourType.N)
     val horariosPorPeriodo = mapOf(
         HourType.M to HourMaps.M.keys,
-        HourType.T to HourMaps.T.keys
+        HourType.T to HourMaps.T.keys,
+        HourType.N to HourMaps.N.keys,
     )
+    val existeDisciplinaPeriodo = periodos.associateWith { periodo ->
+        horarios.any { it.periodo == periodo }
+    }
 
     val horariosMap by remember(horarios) {
         mutableStateOf(horarios.associateBy { Triple(it.diaSemana, it.periodo, it.horario) })
@@ -104,8 +103,11 @@ fun WeeklySchedule(
     val isFileLoaded by DataStoreHelper.isFileLoadedFlow().collectAsState(false)
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .background(LocalAppColors.current.content.background)
+            .wrapContentHeight()
+            .background(LocalAppColors.current.content.background,RoundedCornerShape(8.dp)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+
     ) {
         // Cabeçalho fixo
         DaysOfWeekHeader(diasUteis.values.toList())
@@ -121,7 +123,14 @@ fun WeeklySchedule(
                 horariosPorPeriodo[periodo]?.forEach { horarioNum ->
                     diasUteis.keys.forEach { diaKey ->
                         val celula = horariosMap[Triple(diaKey, periodo, horarioNum)]
-                        list.add(Triple(celula?.disciplina ?: "-----", periodoColor, celula))
+                        if(celula?.disciplina != null){
+                            list.add(Triple(celula.disciplina, periodoColor, celula))
+                        }
+                        else{
+                            if (existeDisciplinaPeriodo[periodo] == true){
+                                list.add(Triple("-----", periodoColor, celula))
+                            }
+                        }
                     }
                 }
             }
@@ -132,7 +141,6 @@ fun WeeklySchedule(
             true -> LazyVerticalGrid(
                 columns = GridCells.Fixed(diasUteis.size),
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(2.dp),
                 contentPadding = PaddingValues(2.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp),
@@ -152,6 +160,25 @@ fun WeeklySchedule(
                             ) {
                                 Text(
                                     text = text,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = UfcatBlack,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 3
+                                )
+                            }
+                        }
+                        else{
+                            Box(
+                                modifier = Modifier
+                                    .aspectRatio(1f)
+                                    .fillMaxWidth()
+                                    .background(Color.Transparent, shape = RoundedCornerShape(4.dp))
+                                    .padding(2.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = UfcatBlack,

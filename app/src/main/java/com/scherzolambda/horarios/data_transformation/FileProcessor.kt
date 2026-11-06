@@ -1,4 +1,5 @@
 package com.scherzolambda.horarios.data_transformation
+
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -35,6 +36,7 @@ data class Identificacao(
     val formacao: String = ""
 )
 
+
 class FileProcessor {
     /**
      * Extrai todas as tabelas de um arquivo HTML específico.
@@ -49,7 +51,7 @@ class FileProcessor {
         val doc = try {
             Jsoup.parse(File(filePath), null)
         } catch (e: Exception) {
-            println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
+            //println("Erro ao carregar ou analisar o arquivo HTML: ${e.message}")
             return Pair(null, emptyList())
         }
 
@@ -57,25 +59,98 @@ class FileProcessor {
         val tables = doc.select("table")
 
         if (tables.isEmpty()) {
-            println("Nenhuma tabela encontrada no documento HTML.")
             return Pair(null, emptyList())
         }
 
-        tables.forEachIndexed { tableIndex, table ->
+        tables.forEach{ table ->
             val disciplinasDaTabela = mutableListOf<Disciplina>()
             val rows = table.select("tbody tr")
-            if (!(tableIndex == 0 || tableIndex == 2)) {
-                // ...processamento das disciplinas...
-                rows.forEach { row ->
-                    val cells = row.select("td")
-                    try {
-                        val componenteCurricular = cells[1].select("span.componente").text()
-                        val localRaw = cells[1].select("span.local").text()
-                        val local = localRaw.replaceFirst(Regex("(?i)\\s*Local\\s*:\\s*"), "").trim()
-                        val docente = cells[1].select("span.docente").text()
+
+            val idTabela = table.id()
+            when (idTabela) {
+
+                "identificacao" -> {
+                    val map = mutableMapOf<String, String>()
+
+                    rows.forEach { row ->
+                        val cells = row.select("td")
+
+                        if (cells.size >= 2) {
+                            val key = cells[0]
+                                .text()
+                                .replace(":", "")
+                                .trim()
+
+                            val value = cells[1]
+                                .select("strong")
+                                .text()
+                                .ifEmpty { cells[1].text() }
+                                .trim()
+
+                            map[key] = value
+                        }
+
+                        if (cells.size >= 4) {
+                            val key2 = cells[2]
+                                .text()
+                                .replace(":", "")
+                                .trim()
+
+                            val value2 = cells[3]
+                                .select("strong")
+                                .text()
+                                .ifEmpty { cells[3].text() }
+                                .trim()
+
+                            map[key2] = value2
+                        }
+                    }
+
+                    identificacao = Identificacao(
+                        periodoLetivo = map["Período Letivo"] ?: "",
+                        matricula = map["Matrícula"] ?: "",
+                        nome = map["Nome"] ?: "",
+                        curso = map["Curso"] ?: "",
+                        formacao = map["Formação"] ?: ""
+                    )
+                }
+                "matriculas" -> {
+
+                    rows.forEach { row ->
+
+                        val cells = row.select("td")
+
+                        if (cells.size < 5) {
+                            return@forEach
+                        }
+
+                        val componenteCurricular = cells[1]
+                            .select("span.componente")
+                            .text()
+
+                        val localRaw = cells[1]
+                            .select("span.local")
+                            .text()
+
+                        val local = localRaw
+                            .replaceFirst(
+                                Regex("(?i)\\s*Local\\s*:\\s*"),
+                                ""
+                            )
+                            .trim()
+
+                        val docente = cells[1]
+                            .select("span.docente")
+                            .text()
+
                         val horarioBruto = cells[4].text()
-                        val horarioLimpo = horarioBruto.replace(Regex("\\s*\\(.*?\\)"), "")
-//                        Log.d("FileProcessor", " Horário limpo: '$local | $docente'")
+
+                        val horarioLimpo = horarioBruto
+                            .replace(
+                                Regex("\\s*\\(.*?\\)"),
+                                ""
+                            )
+
                         val disciplina = Disciplina(
                             codigo = cells[0].text(),
                             componenteCurricular = componenteCurricular,
@@ -85,35 +160,9 @@ class FileProcessor {
                             horario = horarioLimpo,
                             local = local
                         )
+
                         disciplinasDaTabela.add(disciplina)
-                    } catch (e: Exception) {
-//                        println("Erro ao processar linha da Tabela ${tableIndex + 1}: ${e.message}")
                     }
-                }
-            } else {
-                // Processa tabela de identificação
-                if (table.id() == "identificacao") {
-                    val map = mutableMapOf<String, String>()
-                    rows.forEach { row ->
-                        val cells = row.select("td")
-                        if (cells.size >= 2) {
-                            val key = cells[0].text().replace(":", "").trim()
-                            val value = cells[1].select("strong").text().ifEmpty { cells[1].text() }.trim()
-                            map[key] = value
-                        }
-                        if (cells.size >= 4) {
-                            val key2 = cells[2].text().replace(":", "").trim()
-                            val value2 = cells[3].select("strong").text().ifEmpty { cells[3].text() }.trim()
-                            map[key2] = value2
-                        }
-                    }
-                    identificacao = Identificacao(
-                        periodoLetivo = map["Período Letivo"] ?: "",
-                        matricula = map["Matrícula"] ?: "",
-                        nome = map["Nome"] ?: "",
-                        curso = map["Curso"] ?: "",
-                        formacao = map["Formação"] ?: ""
-                    )
                 }
             }
             tabelasExtraidas.add(disciplinasDaTabela)
